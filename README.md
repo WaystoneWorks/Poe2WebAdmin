@@ -113,4 +113,4 @@ Contributing: [CONTRIBUTING.md](https://github.com/WaystoneWorks/Poe2ModdingProj
 
 ## License
 
-MIT OR Apache-2.0, at your option: [LICENSE-MIT](LICENSE-MIT), [LICENSE-APACHE](LICENSE-APACHE). Copyright (c) 2026 WaystoneWorks and contributors.
+MIT: [LICENSE](LICENSE). Copyright (c) 2026 WaystoneWorks and contributors.
