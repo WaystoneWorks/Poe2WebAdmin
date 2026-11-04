@@ -14,6 +14,7 @@ The web admin site of the **Path of Exile 2 client 0.5.5e.hotfix1 private server
 | Instances | List, close, create (area, seed, topology, orientation) |
 | Accounts | List, change role, disable and enable, ban |
 | Characters | List (filter by account), detail view |
+| Leagues | League families with banners, HC/SSF variants, state and character counts; new, edit, hide/show, end into a permanent league (per-variant mapping, typed confirmation), delete; the "needs a league" popup and Dashboard card while none is active |
 | Schedule | Scheduled tasks (restart with countdown and message) by day, weekdays, interval or cron in the server's time zone; next-run preview, on/off, edit, delete, history |
 | Config | The server's config file: form for common keys, raw TOML with syntax check (line and column), diff, Save or Save and restart, backups |
 | Announce | Button at the foot of the sidebar: a chat line to everyone |
@@ -93,6 +94,7 @@ src/
   lib/serverLink.ts, shutdown.ts    reconnect state machine, countdown limits
   lib/ui/                           shared components (Icon, Chip, Modal, ServerControl, ShutdownBanner, LineChart.svelte, ActivityCharts, MotdCard, BanDialog, DiffView, ...)
   lib/chart.ts, duration.ts         chart scaling; "7d" and "1h30m" parsing for bans
+  lib/leagues.ts                     variant ids, end mapping, date inputs, popup rule
   lib/schedule.ts, configForm.ts    task and config forms and their checks
   lib/diff.ts, players.ts, motd.ts  config line diff; player filters and ban wording; message limits
 scripts/gen-api.mjs                 the gen:api script

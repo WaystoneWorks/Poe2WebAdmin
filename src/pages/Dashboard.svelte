@@ -10,6 +10,7 @@
   import ServerControl from '../lib/ui/ServerControl.svelte';
   import { formatBytes, formatMicros } from '../lib/chart';
   import ActivityCharts from '../lib/ui/ActivityCharts.svelte';
+  import { leagueStore } from '../lib/leagueStore.svelte';
   import MotdCard from '../lib/ui/MotdCard.svelte';
 
   // A calm overview: four numbers, the activity, who is on, the message of the day. Restart and
@@ -42,6 +43,13 @@
   <Status {res} />
   {#if d}<ServerControl compact online={d.server.online} uptime={d.server.uptime_secs} />{/if}
 </PageHead>
+
+{#if leagueStore.missing}
+  <div class="notice danger" role="alert">
+    <span class="notice-title"><Icon name="alert" size={16} /> This server has no league</span>
+    <p class="muted">Players can log in but cannot create characters. <a href="#/leagues?new=1">Create a league</a></p>
+  </div>
+{/if}
 
 {#if d}
   <div class="tiles">

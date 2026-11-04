@@ -22,6 +22,9 @@ export type RunView = Schemas['RunView'];
 export type ConfigFile = Schemas['ConfigFile'];
 export type ModsAdminInfo = Schemas['ModsAdminInfo'];
 export type ModStatusInfo = Schemas['ModStatusInfo'];
+export type PublicLeague = Schemas['PublicLeague'];
+export type LeagueFlagView = Schemas['LeagueFlagView'];
+export type MechanicView = Schemas['MechanicView'];
 
 /** An error response: the HTTP status and the server's `{"error": "..."}` text. */
 export class ApiError extends Error {

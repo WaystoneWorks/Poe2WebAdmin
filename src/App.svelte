@@ -27,6 +27,9 @@
   import Config from './pages/Config.svelte';
   import Mods from './pages/Mods.svelte';
   import Panel from './pages/Panel.svelte';
+  import Leagues from './pages/Leagues.svelte';
+  import LeaguePopup from './lib/ui/LeaguePopup.svelte';
+  import { leagueStore } from './lib/leagueStore.svelte';
 
   interface NavItem {
     page: string;
@@ -51,6 +54,7 @@
         { page: 'players', label: 'Players', icon: 'players' },
         { page: 'accounts', label: 'Accounts', icon: 'accounts' },
         { page: 'characters', label: 'Characters', icon: 'characters' },
+        { page: 'leagues', label: 'Leagues', icon: 'trophy' },
       ],
     },
     {
@@ -112,6 +116,13 @@
   $effect(() => {
     if (!auth.loggedIn) return;
     return server.start();
+  });
+
+  // The league list backs the "needs a league" popup: read at sign-in and on every page change.
+  $effect(() => {
+    if (!auth.loggedIn) return;
+    void page;
+    void leagueStore.load();
   });
 
   let announceOpen = $state(false);
@@ -216,6 +227,8 @@
               {:else}
                 <Characters />
               {/if}
+            {:else if page === 'leagues'}
+              <Leagues />
             {:else if page === 'mods'}
               <Mods />
             {:else if page === 'schedule'}
@@ -232,6 +245,8 @@
       </main>
     </div>
   </div>
+
+  <LeaguePopup />
 
   <Modal bind:open={announceOpen} title="Announce to all players" icon="announce">
     <form onsubmit={announce}>

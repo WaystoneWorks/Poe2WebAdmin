@@ -43,6 +43,7 @@
     save: ['M5 4h11l4 4v11a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1z', 'M8 4v5h7V4', 'M8 20v-6h8v6'],
     server: ['M5 4h14a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z', 'M5 13h14a2 2 0 012 2v3a2 2 0 01-2 2H5a2 2 0 01-2-2v-3a2 2 0 012-2z', 'M7 7.5h.01M7 16.5h.01'],
     chevron: ['M6 9l6 6 6-6'],
+    trophy: ['M8 4h8v5a4 4 0 01-8 0V4z', 'M8 6H5a3 3 0 003 4M16 6h3a3 3 0 01-3 4', 'M12 13v4M8.5 20h7M10 17h4'],
   } as const;
   export type IconName = keyof typeof paths;
 </script>

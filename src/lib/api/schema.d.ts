@@ -282,6 +282,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/data/league-flags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The `LeagueFlag` rows (banners to pick from). */
+        get: operations["league_flags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/data/league-mechanics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The league mechanics of the game data. */
+        get: operations["league_mechanics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/instances": {
         parameters: {
             query?: never;
@@ -311,6 +345,84 @@ export interface paths {
         put?: never;
         /** Closes an instance; its players are disconnected. */
         post: operations["close_instance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/leagues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every league with its state, character count and art. */
+        get: operations["admin_list_leagues"];
+        put?: never;
+        /**
+         * Creates a family: the base and the variants the flags ask for. `400` for a bad name, dates,
+         *     unknown flag or mechanic or a bad `migrate_to`; `409` when a name is taken.
+         */
+        post: operations["create_league"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/leagues/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Changes a league. `400` for a bad value, `404` unknown league, `409` an ended league. */
+        post: operations["update_league"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/leagues/{id}/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Deletes a variant, or a whole family for a base league; only while no character is in it.
+         *     `400` when `confirm` is not the id, `404` unknown, `409` with characters.
+         */
+        post: operations["delete_league"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/leagues/{id}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ends the family `{id}` belongs to and moves its characters into `target`. `400` for a bad
+         *     target, `404` unknown league, `409` already ended.
+         */
+        post: operations["end_league"];
         delete?: never;
         options?: never;
         head?: never;
@@ -719,6 +831,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/art/{path}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A game image (a `.dds` file or a UI image id under `Art/`) as a PNG. Cached for a day. */
+        get: operations["get_art"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/game-token": {
         parameters: {
             query?: never;
@@ -737,6 +866,23 @@ export interface paths {
          *     lasts `[accounts] remember_days` and does not touch the account's other tokens.
          */
         post: operations["game_token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/leagues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The active leagues, defaults first as the store orders them. */
+        get: operations["list_leagues"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -974,6 +1120,34 @@ export interface components {
             role: string;
             username: string;
         };
+        /** @description A league in the admin list. */
+        AdminLeague: {
+            art: components["schemas"]["FlagArt"];
+            /** Format: int32 */
+            characters: number;
+            /** Format: int64 */
+            created_at: number;
+            display_name: string;
+            /** Format: int64 */
+            ends_at?: number | null;
+            family: string;
+            flag?: string | null;
+            hardcore: boolean;
+            id: string;
+            is_default: boolean;
+            /** @description `CoreLeagues` ids (stored only; none is implemented). */
+            mechanics: string[];
+            /** @description The family characters move to when this one ends. */
+            migrate_to?: string | null;
+            permanent: boolean;
+            /** Format: int64 */
+            sort: number;
+            ssf: boolean;
+            /** Format: int64 */
+            starts_at?: number | null;
+            /** @description `active`, `hidden` or `ended`. */
+            state: string;
+        };
         /** @description `POST /admin/announce`. */
         AnnounceRequest: {
             message: string;
@@ -1132,9 +1306,59 @@ export interface components {
             /** @description 3-64 characters from `A-Za-z0-9_.@+-`. */
             username: string;
         };
+        /** @description `POST /admin/leagues`: a new family. */
+        CreateLeagueRequest: {
+            /** @description Make this the default family. */
+            default?: boolean;
+            /**
+             * Format: int64
+             * @description Unix seconds; absent: never.
+             */
+            ends_at?: number | null;
+            /** @description `LeagueFlag.Id` of the base; the variants get the set's own banners. */
+            flag?: string | null;
+            /** @description Also create "HC <name>". */
+            hardcore?: boolean;
+            /** @description `CoreLeagues` ids. */
+            mechanics?: string[];
+            /** @description Family characters move to when this one ends. */
+            migrate_to?: string | null;
+            /** @description The base league's id and display name. */
+            name: string;
+            /** @description A permanent family (no end; a target for ended leagues). */
+            permanent?: boolean;
+            /** @description Also create the SSF variants ("SSF <name>", and "HC SSF <name>" with `hardcore`). */
+            ssf?: boolean;
+            /**
+             * Format: int64
+             * @description Unix seconds; absent: open now.
+             */
+            starts_at?: number | null;
+        };
         CreatedInstance: {
             /** Format: int32 */
             id: number;
+        };
+        /** @description `POST /admin/leagues/{id}/delete`. */
+        DeleteLeagueRequest: {
+            /** @description Must equal the league id in the path. */
+            confirm: string;
+        };
+        DeleteLeagueResponse: {
+            /** @description The ids deleted: the league, or its whole family for a base. */
+            deleted: string[];
+        };
+        /** @description `POST /admin/leagues/{id}/end`. */
+        EndLeagueRequest: {
+            /** @description The family (a league id) the characters move to. */
+            target: string;
+        };
+        EndLeagueResponse: {
+            count: number;
+            /** @description The base id of the ended family. */
+            family: string;
+            moved: components["schemas"]["LeagueMoveView"][];
+            target: string;
         };
         /** @description Body of every error response. */
         ErrorBody: {
@@ -1158,6 +1382,17 @@ export interface components {
              *     filled from any text; empty when the text does not parse.
              */
             values: Record<string, never>;
+        };
+        /** @description Art of a `LeagueFlag` row as URLs (`null` when the row has none). */
+        FlagArt: {
+            /** @description Login-screen banner. */
+            banner_url?: string | null;
+            /** @description Character-creation banner icon. */
+            creation_url?: string | null;
+            /** @description Small icon. */
+            icon_url?: string | null;
+            /** @description League logo. */
+            logo_url?: string | null;
         };
         InstanceView: {
             area: string;
@@ -1183,6 +1418,24 @@ export interface components {
              * @description Forced topology (1-based); absent: the client's choice.
              */
             topology?: number | null;
+        };
+        /** @description A `LeagueFlag` row. */
+        LeagueFlagView: {
+            art: components["schemas"]["FlagArt"];
+            hardcore: boolean;
+            id: string;
+            /** Format: int32 */
+            row: number;
+            ruthless: boolean;
+            ssf: boolean;
+        };
+        /** @description One character moved when a family ended. */
+        LeagueMoveView: {
+            /** Format: int32 */
+            character_id: number;
+            from: string;
+            name: string;
+            to: string;
         };
         /** @description `GET /local/metrics`: the newest sample, for the launcher that hosts the server. */
         LocalMetrics: {
@@ -1270,6 +1523,14 @@ export interface components {
             kind: string;
             /** @description 64 hex characters: send as `Authorization: Bearer <token>`. Shown only once. */
             token: string;
+        };
+        /** @description A league mechanic (`CoreLeagues` row). */
+        MechanicView: {
+            id: string;
+            /** @description Always false for now: leagues store mechanics, none is implemented. */
+            implemented: boolean;
+            /** @description The id split into words. */
+            name: string;
         };
         /** @description One sample. */
         MetricsPoint: {
@@ -1513,6 +1774,28 @@ export interface components {
             next_runs: number[];
             timezone: string;
         };
+        /** @description A league in the public list. */
+        PublicLeague: {
+            /** @description `/api/v1/art/...` URL of the banner; null without a flag or game data. */
+            banner_url?: string | null;
+            display_name: string;
+            /** Format: int64 */
+            ends_at?: number | null;
+            /** @description The base league's id. */
+            family: string;
+            /** @description `LeagueFlag.Id` of the banner. */
+            flag?: string | null;
+            hardcore: boolean;
+            id: string;
+            is_default: boolean;
+            permanent: boolean;
+            ssf: boolean;
+            /**
+             * Format: int64
+             * @description Unix seconds.
+             */
+            starts_at?: number | null;
+        };
         /** @description `POST /register`. */
         RegisterRequest: {
             /** @description Plain text, at least 8 characters. Use HTTPS outside the local machine. */
@@ -1736,6 +2019,32 @@ export interface components {
             seed?: number | null;
             /** Format: int32 */
             topology?: number | null;
+        };
+        /** @description `POST /admin/leagues/{id}`: absent fields stay, `null` clears the nullable ones. */
+        UpdateLeagueRequest: {
+            /** @description Family-wide. */
+            default?: boolean | null;
+            display_name?: string | null;
+            /**
+             * Format: int64
+             * @description Family-wide, unix seconds; `null` clears.
+             */
+            ends_at?: number | null;
+            /** @description `LeagueFlag.Id`; `null` clears. */
+            flag?: string | null;
+            /** @description Family-wide. */
+            mechanics?: string[] | null;
+            /** @description Family-wide; `null` clears. */
+            migrate_to?: string | null;
+            /** @description Family-wide. */
+            permanent?: boolean | null;
+            /**
+             * Format: int64
+             * @description Family-wide, unix seconds; `null` clears.
+             */
+            starts_at?: number | null;
+            /** @description `active` or `hidden` (ending is `POST /admin/leagues/{id}/end`). */
+            state?: string | null;
         };
         /** @description `POST /admin/config/validate`. */
         ValidateRequest: {
@@ -2633,6 +2942,92 @@ export interface operations {
             };
         };
     };
+    league_flags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeagueFlagView"][];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    league_mechanics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MechanicView"][];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
     instances: {
         parameters: {
             query?: never;
@@ -2752,6 +3147,310 @@ export interface operations {
                 };
             };
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    admin_list_leagues: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLeague"][];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    create_league: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLeagueRequest"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLeague"][];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    update_league: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description league id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateLeagueRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminLeague"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    delete_league: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description league id */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteLeagueRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteLeagueResponse"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    end_league: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description any league id of the family */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EndLeagueRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EndLeagueResponse"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3807,6 +4506,52 @@ export interface operations {
             };
         };
     };
+    get_art: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description game path under Art/: a .dds file, or a UI image id without extension */
+                path: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "image/png": number[];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
     game_token: {
         parameters: {
             query?: never;
@@ -3839,6 +4584,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_leagues: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublicLeague"][];
                 };
             };
         };
