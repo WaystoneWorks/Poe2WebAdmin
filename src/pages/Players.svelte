@@ -93,6 +93,35 @@
     }
   }
 
+  // --- unlock dialog (waypoints and act maps: the server's `unlock` / `lock` commands)
+  let unlockFor = $state<string | null>(null);
+  let unlockOpen = $state(false);
+  let unlockWhat = $state<'all' | 'act' | 'waypoint'>('all');
+  let unlockValue = $state('');
+  let unlockLock = $state(false);
+  const unlockBad = $derived(unlockWhat !== 'all' && unlockValue.trim() === '');
+
+  function openUnlock(name: string) {
+    unlockFor = name;
+    unlockWhat = 'all';
+    unlockValue = '';
+    unlockLock = false;
+    unlockOpen = true;
+  }
+  async function submitUnlock(e: SubmitEvent) {
+    e.preventDefault();
+    const name = unlockFor!;
+    const ok = await run(() =>
+      unwrap(
+        api.POST('/api/v1/admin/players/{name}/unlock', {
+          params: { path: { name } },
+          body: { what: unlockWhat, value: unlockWhat === 'all' ? null : unlockValue.trim(), lock: unlockLock },
+        }),
+      ),
+    );
+    if (ok) unlockOpen = false;
+  }
+
   // --- transfer dialog
   let transferFor = $state<string | null>(null);
   let transferOpen = $state(false);
@@ -246,6 +275,7 @@
                       <button type="button" class="btn sm" onclick={() => openMute(s.character)}><Icon name="mute" size={13} /> Mute</button>
                     {/if}
                     <button type="button" class="btn sm" onclick={() => openTransfer(s.character)}><Icon name="transfer" size={13} /> Transfer</button>
+                    <button type="button" class="btn sm" onclick={() => openUnlock(s.character)} title="Waypoints and act maps">Unlock</button>
                     <button type="button" class="btn sm danger" onclick={() => kick(s.character)}><Icon name="kick" size={13} /> Kick</button>
                     <button
                       type="button"
@@ -330,6 +360,30 @@
     <div class="actions">
       <button type="button" class="btn" onclick={() => (muteOpen = false)}>Cancel</button>
       <button type="submit" class="btn primary" disabled={minutesBad}>Mute</button>
+    </div>
+  </form>
+</Modal>
+
+<Modal bind:open={unlockOpen} title={`Waypoints of ${unlockFor ?? ''}`}>
+  <form onsubmit={submitUnlock}>
+    <div class="field">
+      <span id="unlock-what">Which</span>
+      <div class="seg" role="radiogroup" aria-labelledby="unlock-what">
+        <button type="button" role="radio" aria-checked={unlockWhat === 'all'} class:on={unlockWhat === 'all'} onclick={() => (unlockWhat = 'all')}>All acts and interludes</button>
+        <button type="button" role="radio" aria-checked={unlockWhat === 'act'} class:on={unlockWhat === 'act'} onclick={() => (unlockWhat = 'act')}>One act</button>
+        <button type="button" role="radio" aria-checked={unlockWhat === 'waypoint'} class:on={unlockWhat === 'waypoint'} onclick={() => (unlockWhat = 'waypoint')}>One waypoint</button>
+      </div>
+    </div>
+    {#if unlockWhat !== 'all'}
+      <label class="field">
+        <span>{unlockWhat === 'act' ? 'Act (1-4; 6 = the interludes)' : 'Area id (G1_4)'}</span>
+        <input bind:value={unlockValue} aria-invalid={unlockBad} />
+      </label>
+    {/if}
+    <label class="field"><span><input type="checkbox" bind:checked={unlockLock} /> Lock instead</span></label>
+    <div class="actions">
+      <button type="button" class="btn" onclick={() => (unlockOpen = false)}>Cancel</button>
+      <button type="submit" class="btn primary" disabled={unlockBad}>{unlockLock ? 'Lock' : 'Unlock'}</button>
     </div>
   </form>
 </Modal>

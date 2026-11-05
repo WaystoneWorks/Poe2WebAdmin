@@ -605,6 +605,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/players/{name}/unlock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Unlocks (or locks) waypoints and act maps of an online character: the `unlock` command. */
+        post: operations["unlock"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/players/{name}/unmute": {
         parameters: {
             query?: never;
@@ -2052,6 +2069,17 @@ export interface components {
             seed?: number | null;
             /** Format: int32 */
             topology?: number | null;
+        };
+        /** @description `POST /admin/players/{name}/unlock`: the `unlock` command's choices. */
+        UnlockRequest: {
+            /** @description Locks instead. */
+            lock?: boolean;
+            value?: string | null;
+            /**
+             * @description `all` (default, every act and interlude), `act` (with `value` the `WorldAreas.Act`, the
+             *     interludes are 6) or `waypoint` (with `value` an area id).
+             */
+            what?: string | null;
         };
         /** @description `POST /admin/leagues/{id}`: absent fields stay, `null` clears the nullable ones. */
         UpdateLeagueRequest: {
@@ -3921,6 +3949,57 @@ export interface operations {
                 };
             };
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    unlock: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description character name */
+                name: string;
+            };
+            cookie?: never;
+        };
+        /** @description optional */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UnlockRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommandResult"];
+                };
+            };
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
