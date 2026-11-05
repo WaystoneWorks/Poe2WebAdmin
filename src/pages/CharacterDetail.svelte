@@ -8,6 +8,7 @@
   import Chip from '../lib/ui/Chip.svelte';
   import Empty from '../lib/ui/Empty.svelte';
   import Spinner from '../lib/ui/Spinner.svelte';
+  import MoveLeagueDialog from '../lib/ui/MoveLeagueDialog.svelte';
 
   let { id }: { id: string } = $props();
 
@@ -17,6 +18,7 @@
     return res.start(5000);
   });
   const c = $derived(res.data);
+  let moveOpen = $state(false);
 </script>
 
 <PageHead title={c ? c.name : `Character ${id}`} subtitle="Character detail" icon="characters">
@@ -32,7 +34,7 @@
         <dt>Id</dt><dd>{c.id}</dd>
         <dt>Name</dt><dd>{c.name}</dd>
         <dt>Account</dt><dd>{c.account ?? '-'} <span class="muted">(#{c.account_id})</span></dd>
-        <dt>League</dt><dd>{c.league}</dd>
+        <dt>League</dt><dd>{c.league} <button class="btn sm" onclick={() => (moveOpen = true)}><Icon name="transfer" size={13} /> Move league</button></dd>
         <dt>Class id</dt><dd>{c.class_id}</dd>
         <dt>Level</dt><dd>{c.level}</dd>
         <dt>Experience</dt><dd>{c.experience.toLocaleString()}</dd>
@@ -60,6 +62,7 @@
   {#if features.passives}
     <div class="section"><Empty icon="passives" title="Passive tree">Waiting for the inventory work.</Empty></div>
   {/if}
+  <MoveLeagueDialog bind:open={moveOpen} character={c} done={() => void res.load()} />
 {:else if res.error}
   <div class="notice danger" role="alert"><span class="notice-title"><Icon name="alert" size={16} /> {res.error}</span></div>
 {:else}

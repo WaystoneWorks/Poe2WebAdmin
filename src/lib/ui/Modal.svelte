@@ -7,8 +7,9 @@
     title,
     icon,
     danger = false,
+    wide = false,
     children,
-  }: { open?: boolean; title: string; icon?: IconName; danger?: boolean; children: Snippet } = $props();
+  }: { open?: boolean; title: string; icon?: IconName; danger?: boolean; wide?: boolean; children: Snippet } = $props();
 
   const titleId = $props.id();
   let dialog: HTMLDialogElement | undefined = $state();
@@ -24,6 +25,7 @@
 <dialog
   bind:this={dialog}
   class="modal"
+  class:wide
   aria-labelledby={titleId}
   onclose={() => (open = false)}
   onclick={(e) => {

@@ -134,3 +134,8 @@ function safeSession(): Storage | undefined {
     return undefined;
   }
 }
+
+/** The leagues an admin can move a character into: every league that has not ended, except the one it is in. */
+export function moveTargets(all: AdminLeague[], current: string): AdminLeague[] {
+  return all.filter((l) => l.state !== 'ended' && l.id !== current);
+}

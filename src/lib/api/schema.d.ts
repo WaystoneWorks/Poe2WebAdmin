@@ -166,6 +166,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/characters/{id}/league": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Moves a character into another league, whatever its flags (an admin's move; players leave
+         *     SSF or hardcore in game). `409` while the character is online, in the target's league
+         *     already or the target has ended, `404` for an unknown character or league.
+         */
+        post: operations["move_character"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/config": {
         parameters: {
             query?: never;
@@ -1133,6 +1154,11 @@ export interface components {
             family: string;
             flag?: string | null;
             hardcore: boolean;
+            /**
+             * @description What a hardcore death does here: `softcore` (the character moves to the softcore
+             *     league) or `stay`. Stored now; used once death exists.
+             */
+            hc_death: string;
             id: string;
             is_default: boolean;
             /** @description `CoreLeagues` ids (stored only; none is implemented). */
@@ -1319,6 +1345,8 @@ export interface components {
             flag?: string | null;
             /** @description Also create "HC <name>". */
             hardcore?: boolean;
+            /** @description `softcore` (default) or `stay`: what a hardcore death does. */
+            hc_death?: string | null;
             /** @description `CoreLeagues` ids. */
             mechanics?: string[];
             /** @description Family characters move to when this one ends. */
@@ -1680,6 +1708,11 @@ export interface components {
             /** @description Whether it was also written into the config file, so it survives a restart. */
             persisted: boolean;
         };
+        /** @description `POST /admin/characters/{id}/league`. */
+        MoveCharacterRequest: {
+            /** @description The league id to move the character into (any league that has not ended). */
+            league: string;
+        };
         /** @description `POST /admin/players/{name}/mute`. */
         MuteRequest: {
             /**
@@ -2032,6 +2065,8 @@ export interface components {
             ends_at?: number | null;
             /** @description `LeagueFlag.Id`; `null` clears. */
             flag?: string | null;
+            /** @description Family-wide: `softcore` or `stay`. */
+            hc_death?: string | null;
             /** @description Family-wide. */
             mechanics?: string[] | null;
             /** @description Family-wide; `null` clears. */
@@ -2635,6 +2670,64 @@ export interface operations {
                 };
             };
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    move_character: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description character id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoveCharacterRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeagueMoveView"];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

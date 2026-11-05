@@ -8,6 +8,7 @@ import {
   endTargets,
   families,
   inputToUnix,
+  moveTargets,
   needsLeaguePopup,
   popupDismissed,
   unixToInput,
@@ -18,7 +19,7 @@ import {
 function lg(id: string, family: string, hardcore: boolean, ssf: boolean, o: Partial<AdminLeague> = {}): AdminLeague {
   return {
     id, display_name: id, family, hardcore, ssf, permanent: false, is_default: false, state: 'active',
-    characters: 0, mechanics: [], sort: 0, created_at: 0, art: {}, ...o,
+    characters: 0, mechanics: [], sort: 0, created_at: 0, art: {}, hc_death: 'softcore', ...o,
   };
 }
 const dawn = [lg('Dawn', 'Dawn', false, false, { characters: 5 }), lg('HC Dawn', 'Dawn', true, false, { characters: 2 }), lg('SSF Dawn', 'Dawn', false, true, { characters: 1 }), lg('HC SSF Dawn', 'Dawn', true, true, { characters: 3 })];
@@ -96,5 +97,16 @@ describe('needs-a-league popup', () => {
     expect(needsLeaguePopup([], true)).toBe(false);
     expect(popupDismissed({ getItem: () => '1' })).toBe(true);
     expect(popupDismissed({ getItem: () => null })).toBe(false);
+  });
+});
+
+describe('moving a character', () => {
+  it('offers every league that has not ended except the current one', () => {
+    const all = [...dawn, ...std].map((l) => (l.id === 'HC Dawn' ? { ...l, state: 'hidden' } : l.id === 'Hardcore' ? { ...l, state: 'ended' } : l));
+    const ids = moveTargets(all, 'SSF Dawn').map((l) => l.id);
+    expect(ids).toContain('HC Dawn');
+    expect(ids).toContain('Standard');
+    expect(ids).not.toContain('SSF Dawn');
+    expect(ids).not.toContain('Hardcore');
   });
 });

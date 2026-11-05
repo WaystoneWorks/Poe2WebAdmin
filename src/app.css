@@ -224,8 +224,9 @@ td select { min-height: 30px; width: auto; padding: 0 30px 0 10px; }
 /* ---------------------------------------------------------------- dialogs and toasts */
 dialog.modal {
   background: var(--surface); color: var(--text); border: 1px solid var(--gold); border-radius: var(--radius); padding: 0;
-  width: min(520px, calc(100vw - 24px)); box-shadow: var(--shadow); margin: auto; max-height: calc(100vh - 24px); overflow: auto;
+  width: min(520px, calc(100vw - 24px)); box-shadow: var(--shadow); margin: auto; max-height: calc(100vh - 24px); overflow-x: hidden; overflow-y: auto;
 }
+dialog.modal.wide { width: min(720px, calc(100vw - 24px)); }
 dialog.modal[open] { animation: dialog-in var(--dur-slow) var(--ease); }
 dialog.modal::backdrop { background: rgb(5 2 2 / 0.65); animation: fade-in var(--dur) var(--ease); }
 .dialog-body { padding: 22px; }
@@ -437,7 +438,7 @@ textarea.code { display: block; width: 100%; min-height: 380px; height: calc(100
   .side-actions .btn { justify-content: center; padding: 0; }
   .side-foot { flex-direction: column; }
   main { padding: 18px 16px 24px; }
-  .grid3, .grid2 { grid-template-columns: 1fr; }
+  .grid3, .grid2 { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
   .body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }

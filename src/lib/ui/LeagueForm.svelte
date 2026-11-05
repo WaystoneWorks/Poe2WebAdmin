@@ -43,6 +43,7 @@
   let starts = $state('');
   let ends = $state('');
   let migrate = $state('');
+  let hcDeath = $state('softcore');
   let picked = $state<string[]>([]);
   let busy = $state(false);
 
@@ -60,6 +61,7 @@
     starts = unixToInput(base?.starts_at);
     ends = unixToInput(base?.ends_at);
     migrate = base?.migrate_to ?? '';
+    hcDeath = base?.hc_death ?? 'softcore';
     picked = [...(base?.mechanics ?? [])];
   });
 
@@ -94,6 +96,7 @@
                 starts_at: startUnix,
                 ends_at: endUnix,
                 migrate_to: migrate || null,
+                hc_death: hcDeath,
               },
             }),
           );
@@ -112,6 +115,7 @@
               starts_at: startUnix,
               ends_at: endUnix,
               migrate_to: migrate || null,
+              hc_death: hcDeath,
             },
           }),
         );
@@ -132,7 +136,7 @@
   }
 </script>
 
-<Modal bind:open title={family ? `Edit ${family[0]?.id ?? ''}` : 'New league'} icon="trophy">
+<Modal bind:open wide title={family ? `Edit ${family[0]?.id ?? ''}` : 'New league'} icon="trophy">
   <form onsubmit={submit} class="league-form">
     {#if family}
       {#each family as r (r.id)}
@@ -195,6 +199,16 @@
       </select>
     </label>
 
+    {#if family ? family.some((r) => r.hardcore) : hardcore}
+      <label class="field">
+        <span>When a hardcore character dies <span class="tag-soon">stored, used once death exists</span></span>
+        <select bind:value={hcDeath}>
+          <option value="softcore">Move to the softcore league</option>
+          <option value="stay">Stay in the hardcore league</option>
+        </select>
+      </label>
+    {/if}
+
     <div class="field">
       <span id="mech-lbl">Mechanics <span class="tag-soon">stored, not implemented yet</span></span>
       <div class="mechs" role="group" aria-labelledby="mech-lbl">
@@ -217,14 +231,14 @@
 </Modal>
 
 <style>
-  .league-form { min-width: min(640px, 80vw); }
-  .banners { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; max-height: 190px; overflow-y: auto; padding: 2px; }
+  .league-form { min-width: 0; }
+  .banners { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(96px, 100%), 1fr)); gap: 8px; max-height: 190px; overflow-y: auto; padding: 2px; }
   .banner { cursor: pointer; display: grid; place-items: center; min-height: 52px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); }
   .banner:hover { border-color: var(--faint); }
   .banner.on { border-color: var(--gold); background: var(--selected-bg); }
   .banner img { max-width: 100%; max-height: 64px; object-fit: contain; }
   .checks { display: flex; flex-wrap: wrap; gap: 8px 22px; margin-bottom: 14px; }
-  .mechs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px 14px; max-height: 150px; overflow-y: auto; }
+  .mechs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(150px, 100%), 1fr)); gap: 6px 14px; max-height: 150px; overflow-y: auto; }
   .tag-soon { margin-left: 6px; font-size: 11px; color: var(--warn); font-weight: 600; }
   .err { color: var(--danger); font-size: 12.5px; margin: 0 0 10px; }
 </style>
