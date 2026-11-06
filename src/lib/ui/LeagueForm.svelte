@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { roving } from '../roving';
   import { api, unwrap, type LeagueFlagView, type MechanicView } from '../api/client';
   import { run } from '../notify.svelte';
   import {
@@ -36,6 +37,8 @@
   let name = $state('');
   let names = $state<Record<string, string>>({});
   let flag = $state<string | null>(null);
+  // Banners whose image did not load show their id instead of an empty tile.
+  let broken = $state<Record<string, true>>({});
   let hardcore = $state(true);
   let ssf = $state(true);
   let permanent = $state(false);
@@ -157,11 +160,11 @@
       {#if baseFlags.length === 0}
         <p class="hint">No league art found: the server has no game data loaded.</p>
       {:else}
-        <div class="banners" role="radiogroup" aria-labelledby="banner-lbl">
+        <div class="banners" role="radiogroup" use:roving aria-labelledby="banner-lbl">
           {#each baseFlags as f (f.id)}
             {@const url = bannerOf(f)}
             <button type="button" role="radio" aria-checked={flag === f.id} class="banner" class:on={flag === f.id} title={f.id} onclick={() => (flag = f.id)}>
-              {#if url}<img src={url} alt={f.id} loading="lazy" />{:else}<span class="muted">{f.id}</span>{/if}
+              {#if url && !broken[f.id]}<img src={url} alt={f.id} loading="lazy" onerror={() => (broken[f.id] = true)} />{:else}<span class="muted banner-name">{f.id}</span>{/if}
             </button>
           {/each}
         </div>
@@ -232,6 +235,7 @@
 
 <style>
   .league-form { min-width: 0; }
+  .banner-name { font-size: 11px; overflow-wrap: anywhere; padding: 4px; }
   .banners { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(96px, 100%), 1fr)); gap: 8px; max-height: 190px; overflow-y: auto; padding: 2px; }
   .banner { cursor: pointer; display: grid; place-items: center; min-height: 52px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); }
   .banner:hover { border-color: var(--faint); }

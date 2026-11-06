@@ -12,7 +12,7 @@ export function filterPlayers(players: readonly Player[], query: string): Player
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   if (words.length === 0) return [...players];
   return players.filter((p) => {
-    const hay = [p.character, p.account, p.area, p.ip ?? '', p.instance != null ? `#${p.instance}` : '', p.muted ? 'muted' : '', p.level != null ? `lvl${p.level}` : '']
+    const hay = [p.character, p.account, p.area, p.ip ?? '', p.instance != null ? `#${p.instance}` : '', p.muted ? 'muted' : '', p.level != null ? `lvl${p.level}` : '', p.class_name ?? '']
       .join(' ')
       .toLowerCase();
     return words.every((w) => hay.includes(w));
@@ -36,12 +36,19 @@ export function connectedFor(connectedAt: number, nowSecs: number): string {
   return formatDuration(Math.max(0, nowSecs - connectedAt)).split(' ').slice(0, 2).join(' ') || '0s';
 }
 
-/** "Class 3, level 17" with what is known. */
-export function classLevel(p: Pick<Player, 'class_id' | 'level'>): string {
+/** The class name from the game data, else "class 3", else null. */
+export function className(p: { class_id?: number | null; class_name?: string | null }): string | null {
+  if (p.class_name) return p.class_name;
+  return p.class_id != null ? `class ${p.class_id}` : null;
+}
+
+/** "Ranger, level 17" with what is known. */
+export function classLevel(p: Pick<Player, 'class_id' | 'class_name' | 'level'>): string {
   const parts: string[] = [];
-  if (p.class_id != null) parts.push(`class ${p.class_id}`);
+  const name = className(p);
+  if (name) parts.push(name);
   if (p.level != null) parts.push(`level ${p.level}`);
-  return parts.length > 0 ? parts.join(', ') : '-';
+  return parts.length > 0 ? parts.join(', ') : '\u2014';
 }
 
 export function banTarget(b: Ban): string {

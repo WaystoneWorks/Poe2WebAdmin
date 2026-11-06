@@ -9,6 +9,7 @@
   import Empty from '../lib/ui/Empty.svelte';
   import Spinner from '../lib/ui/Spinner.svelte';
   import MoveLeagueDialog from '../lib/ui/MoveLeagueDialog.svelte';
+  import { className } from '../lib/players';
 
   let { id }: { id: string } = $props();
 
@@ -33,9 +34,9 @@
       <dl class="kv">
         <dt>Id</dt><dd>{c.id}</dd>
         <dt>Name</dt><dd>{c.name}</dd>
-        <dt>Account</dt><dd>{c.account ?? '-'} <span class="muted">(#{c.account_id})</span></dd>
+        <dt>Account</dt><dd>{c.account ?? '—'} <span class="muted">(#{c.account_id})</span></dd>
         <dt>League</dt><dd>{c.league} <button class="btn sm" onclick={() => (moveOpen = true)}><Icon name="transfer" size={13} /> Move league</button></dd>
-        <dt>Class id</dt><dd>{c.class_id}</dd>
+        <dt>Class</dt><dd>{className(c) ?? '—'} <span class="muted">(id {c.class_id})</span></dd>
         <dt>Level</dt><dd>{c.level}</dd>
         <dt>Experience</dt><dd>{c.experience.toLocaleString()}</dd>
         <dt>Status</dt><dd>{#if c.online}<Chip tone="ok" dot pulse>online</Chip>{:else}<Chip>offline</Chip>{/if}</dd>

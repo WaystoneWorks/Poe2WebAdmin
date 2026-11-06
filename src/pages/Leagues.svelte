@@ -138,7 +138,7 @@
             <Icon name="trophy" size={32} />
           {/if}
         </div>
-        <div class="body">
+        <div class="league-body">
           <ul class="rows">
             {#each f.rows as r (r.id)}
               <li class:dim={r.state !== 'active'}>
@@ -163,7 +163,7 @@
           {/if}
           <div class="row-actions left">
             <button type="button" class="btn sm" onclick={() => openEdit(f.rows)}><Icon name="edit" size={13} /> Edit</button>
-            {#if b.state !== 'ended'}
+            {#if b.state !== 'ended' && !b.permanent}
               <button type="button" class="btn sm" onclick={() => openEnd(b)}>End league...</button>
             {/if}
             <button type="button" class="btn sm danger" onclick={() => openDelete(b)}><Icon name="trash" size={13} /> Delete...</button>
@@ -235,7 +235,7 @@
   .league.ended { opacity: 0.7; }
   .banner-box { flex: none; width: 140px; min-height: 80px; display: grid; place-items: center; background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: var(--radius); color: var(--muted); overflow: hidden; }
   .banner-box img { width: 100%; height: auto; display: block; }
-  .body { flex: 1; min-width: 0; }
+  .league-body { flex: 1; min-width: 0; }
   .rows { list-style: none; margin: 0 0 8px; padding: 0; }
   .rows li { display: flex; align-items: center; gap: var(--sp-2); padding: 6px 0; border-top: 1px solid var(--line-soft); }
   .rows li:first-child { border-top: 0; }

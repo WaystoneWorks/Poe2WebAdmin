@@ -42,5 +42,5 @@ export function summarize(mods: readonly ModStatusInfo[]): string {
     [count('installed'), 'not enabled'],
   ] as const;
   const text = parts.filter(([n]) => n > 0).map(([n, w]) => `${n} ${w}`);
-  return text.length ? text.join(', ') : 'no mods';
+  return text.length ? text.join(', ') : 'No mods installed';
 }

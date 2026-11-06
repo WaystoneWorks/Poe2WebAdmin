@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { roving } from '../lib/roving';
   import Fold from '../lib/ui/Fold.svelte';
   import { api, unwrap, ApiError, type ConfigFile } from '../lib/api/client';
   import { Resource } from '../lib/resource.svelte';
@@ -251,7 +252,7 @@
   };
 </script>
 
-<PageHead title="Config" subtitle={f ? f.path : 'The server configuration file'} icon="settings">
+<PageHead title="Config" subtitle={f ? (f.path.split(/[\\/]/).pop() ?? f.path) : 'The server configuration file'} subtitleTitle={f?.path} icon="settings">
   {#if f}
     <button type="button" class="btn sm" onclick={openBackups}><Icon name="history" size={14} /> Backups</button>
     <button type="button" class="btn sm" onclick={reload} disabled={file.loading || working}><Icon name="refresh" size={14} /> Reload</button>
@@ -260,7 +261,7 @@
 
 {#if f && ready}
   {#each f.notices as n (n)}
-    <div class="notice info"><span class="notice-title"><Icon name="info" size={16} /> {n}</span></div>
+    <div class="notice info"><span class="notice-line"><Icon name="info" size={16} /> <span>{n}</span></span></div>
   {/each}
   {#if f.warnings.length > 0}
     <div class="notice">
@@ -274,7 +275,7 @@
 
   {#if screen === 'edit'}
     <div class="cfg-bar">
-      <div class="seg" role="tablist" aria-label="Editor">
+      <div class="seg" role="tablist" use:roving aria-label="Editor">
         <button type="button" role="tab" aria-selected={tab === 'form'} class:on={tab === 'form'} onclick={() => showTab('form')} disabled={working}>Form</button>
         <button type="button" role="tab" aria-selected={tab === 'raw'} class:on={tab === 'raw'} onclick={() => showTab('raw')} disabled={working}>Raw TOML</button>
       </div>

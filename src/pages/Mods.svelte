@@ -52,7 +52,7 @@
       </table>
     </div>
   {/if}
-  <p class="muted">
+  <p class="muted small mods-foot">
     Login check of the client's mods: {res.data.require_client_mods ? 'on' : 'off'}; extra client mods
     {res.data.allow_extra_client_mods ? 'allowed' : 'refused'} (<code>[mods]</code> in the server config).
   </p>
@@ -61,3 +61,8 @@
 {:else}
   <div class="loading"><Spinner size={20} /> Loading...</div>
 {/if}
+
+<style>
+  .mods-foot { margin-top: var(--sp-4); }
+  :global(.empty-state code), .mods-foot code { white-space: nowrap; }
+</style>

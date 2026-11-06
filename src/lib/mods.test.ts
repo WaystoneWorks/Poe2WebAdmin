@@ -30,7 +30,7 @@ describe('mods page helpers', () => {
   });
 
   it('summarizes the counts', () => {
-    expect(summarize([])).toBe('no mods');
+    expect(summarize([])).toBe('No mods installed');
     expect(summarize([mod('loaded'), mod('loaded'), mod('skipped'), mod('installed')])).toBe(
       '2 loaded, 1 skipped, 1 not enabled',
     );

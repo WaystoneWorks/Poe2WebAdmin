@@ -21,9 +21,11 @@
 </script>
 
 {#if server.phase === 'counting' && p}
-  <div class="banner warn" role="status">
+  <div class="banner warn">
+    <!-- Screen readers hear the scheduled action once; the ticking countdown is not live. -->
+    <span class="sr-only" role="status">{verb} scheduled in {countdownText(p.delay_secs)}{#if p.message}: {p.message}{/if}</span>
     <Icon name="clock" size={18} />
-    <span><strong>{verb} in {countdownText(server.remaining)}</strong>{#if p.message}: {p.message}{/if}
+    <span aria-hidden="true"><strong>{verb} in {countdownText(server.remaining)}</strong>{#if p.message}: {p.message}{/if}
       <span class="muted">(asked by {p.requested_by})</span></span>
     <Progress value={pct} danger label="Time left" />
     <span class="banner-end">

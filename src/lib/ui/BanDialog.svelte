@@ -10,6 +10,7 @@
 </script>
 
 <script lang="ts">
+  import { roving } from '../roving';
   import { api, unwrap } from '../api/client';
   import { confirms, run } from '../notify.svelte';
   import { MAX_BAN_SECS, MIN_BAN_SECS, banLengthOk, formatDuration, parseDuration } from '../duration';
@@ -103,7 +104,7 @@
   <form onsubmit={submit}>
     <div class="field">
       <span id="ban-kind">Ban</span>
-      <div class="seg" role="radiogroup" aria-labelledby="ban-kind">
+      <div class="seg" role="radiogroup" use:roving aria-labelledby="ban-kind">
         <button type="button" role="radio" aria-checked={kind === 'account'} class:on={kind === 'account'} onclick={() => (kind = 'account')}>An account</button>
         <button type="button" role="radio" aria-checked={kind === 'ip'} class:on={kind === 'ip'} onclick={() => (kind = 'ip')}>An IP address</button>
       </div>

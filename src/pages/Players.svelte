@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { roving } from '../lib/roving';
   import { api, unwrap, type BanView, type InstanceView } from '../lib/api/client';
   import { Resource } from '../lib/resource.svelte';
   import { auth } from '../lib/auth.svelte';
@@ -9,6 +10,7 @@
   import PageHead from '../lib/ui/PageHead.svelte';
   import Status from '../lib/ui/Status.svelte';
   import Modal from '../lib/ui/Modal.svelte';
+  import AreaOptions from '../lib/ui/AreaOptions.svelte';
   import Icon from '../lib/ui/Icon.svelte';
   import Chip from '../lib/ui/Chip.svelte';
   import Empty from '../lib/ui/Empty.svelte';
@@ -206,7 +208,7 @@
   {/if}
 </PageHead>
 
-<div class="tabs" role="tablist" aria-label="Players">
+<div class="tabs" role="tablist" aria-label="Players" use:roving>
   <a role="tab" aria-selected={tab === 'online'} class:on={tab === 'online'} href={hrefFor('players')}>
     <Icon name="players" size={15} /> Online {#if res.data}<span class="count">{res.data.sessions.length}</span>{/if}
   </a>
@@ -220,7 +222,7 @@
     <label class="search">
       <Icon name="search" size={14} />
       <span class="sr-only">Search players</span>
-      <input type="search" placeholder="Search characters or accounts" bind:value={filter} />
+      <input type="search" placeholder="Search players" aria-label="Search players by character, account, area or address" bind:value={filter} />
     </label>
     <label class="inline">
       <span>Sort</span>
@@ -392,7 +394,7 @@
   <form onsubmit={submitTransfer}>
     <div class="field">
       <span id="dest">Destination</span>
-      <div class="seg" role="radiogroup" aria-labelledby="dest">
+      <div class="seg" role="radiogroup" use:roving aria-labelledby="dest">
         <button type="button" role="radio" aria-checked={mode === 'instance'} class:on={mode === 'instance'} onclick={() => (mode = 'instance')}>Existing instance</button>
         <button type="button" role="radio" aria-checked={mode === 'new'} class:on={mode === 'new'} onclick={() => (mode = 'new')}>New instance</button>
       </div>
@@ -409,8 +411,9 @@
       </label>
     {:else}
       <label class="field">
-        <span>Area (<code>WorldAreas.Id</code>, e.g. G1_1)</span>
-        <input bind:value={area} required />
+        <span>Area id (e.g. G1_1; type to search by name)</span>
+        <input bind:value={area} required list="transfer-area" autocomplete="off" spellcheck="false" />
+        <AreaOptions id="transfer-area" />
       </label>
       <div class="grid3">
         <label class="field"><span>Seed</span><input type="number" min="0" bind:value={seed} placeholder="auto" /></label>

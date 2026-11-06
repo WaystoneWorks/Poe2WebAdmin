@@ -65,12 +65,12 @@
     </section>
     <section class="card stat-card">
       <h2>Tick time</h2>
-      <p class="big">{d.last && d.last.tick_count > 0 ? formatMicros(d.last.tick_avg_us) : '-'}</p>
+      <p class="big">{d.last && d.last.tick_count > 0 ? formatMicros(d.last.tick_avg_us) : '—'}</p>
       <p class="sub">{d.last && d.last.tick_count > 0 ? `longest ${formatMicros(d.last.tick_max_us)}` : 'no frames while nobody plays'}</p>
     </section>
     <section class="card stat-card">
       <h2>Memory</h2>
-      <p class="big">{d.last && d.last.rss_bytes > 0 ? formatBytes(d.last.rss_bytes) : '-'}</p>
+      <p class="big">{d.last && d.last.rss_bytes > 0 ? formatBytes(d.last.rss_bytes) : '—'}</p>
       <p class="sub">{d.last?.cpu_pct != null ? `CPU ${d.last.cpu_pct.toFixed(0)} %` : 'CPU not measured'}{d.last ? ` · net ${formatBytes(d.last.net_in_bps + d.last.net_out_bps)}/s` : ''}</p>
     </section>
   </div>

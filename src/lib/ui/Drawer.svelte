@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { onMount, type Snippet } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import { DUR, ease, ms } from '../motion';
   import Icon from './Icon.svelte';
@@ -8,9 +8,19 @@
   let { title, onclose, width = 720, children, head }: { title: string; onclose: () => void; width?: number; children: Snippet; head?: Snippet } = $props();
   let panel: HTMLElement | undefined = $state();
 
-  $effect(() => {
+  // Focus moves into the panel on open and back to what opened it on close.
+  onMount(() => {
+    const opener = document.activeElement as HTMLElement | null;
     panel?.focus();
+    return () => {
+      if (opener?.isConnected) opener.focus();
+    };
   });
+
+  /** A modal dialog opened from inside the drawer (a confirm) owns Escape and the focus. */
+  function dialogOpen(): boolean {
+    return document.querySelector('dialog[open]') !== null;
+  }
 
   /** Moves the node to <body>: a transformed page container would clip a fixed panel. */
   function portal(node: HTMLElement) {
@@ -19,6 +29,26 @@
   }
 
   function key(e: KeyboardEvent) {
+    if (e.defaultPrevented || dialogOpen()) return;
+    if (e.key === 'Tab' && panel) {
+      // Keep Tab inside the panel (aria-modal).
+      const items = [...panel.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, [tabindex]:not([tabindex="-1"])')].filter((el) => el.offsetParent !== null);
+      if (items.length === 0) return;
+      const first = items[0]!;
+      const last = items[items.length - 1]!;
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || active === panel)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      } else if (!panel.contains(active)) {
+        e.preventDefault();
+        first.focus();
+      }
+      return;
+    }
     if (e.key === 'Escape') {
       e.preventDefault();
       onclose();

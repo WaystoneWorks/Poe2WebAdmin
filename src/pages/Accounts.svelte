@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { roving } from '../lib/roving';
   import { api, unwrap, type AccountInfo } from '../lib/api/client';
   import { Resource } from '../lib/resource.svelte';
   import { auth } from '../lib/auth.svelte';
@@ -127,7 +128,7 @@
     <span class="sr-only">Search accounts</span>
     <input type="search" placeholder="Search accounts" bind:value={filter} />
   </label>
-  <div class="pills" role="radiogroup" aria-label="Show">
+  <div class="pills" role="radiogroup" use:roving aria-label="Show">
     {#each [['all', 'All'], ['admins', 'Admins'], ['disabled', 'Disabled']] as [id, label] (id)}
       <button type="button" role="radio" aria-checked={show === id} class:on={show === id} onclick={() => (show = id as typeof show)}>{label}</button>
     {/each}

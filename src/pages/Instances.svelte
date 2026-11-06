@@ -6,6 +6,7 @@
   import PageHead from '../lib/ui/PageHead.svelte';
   import Status from '../lib/ui/Status.svelte';
   import Modal from '../lib/ui/Modal.svelte';
+  import AreaOptions from '../lib/ui/AreaOptions.svelte';
   import Icon from '../lib/ui/Icon.svelte';
   import Chip from '../lib/ui/Chip.svelte';
   import Empty from '../lib/ui/Empty.svelte';
@@ -73,7 +74,9 @@
 <div class="toolbar">
   <span class="muted">{res.data ? `${res.data.length} instance${res.data.length === 1 ? '' : 's'}` : ''}</span>
   <span class="grow"></span>
-  <button type="button" class="btn primary" onclick={openCreate}><Icon name="plus" size={14} /> Create instance</button>
+  {#if res.data?.length !== 0}
+    <button type="button" class="btn primary" onclick={openCreate}><Icon name="plus" size={14} /> Create instance</button>
+  {/if}
 </div>
 
 {#if res.data}
@@ -125,8 +128,9 @@
 <Modal bind:open={createOpen} title="Create instance" icon="instances">
   <form onsubmit={create}>
     <label class="field">
-      <span>Area (<code>WorldAreas.Id</code>, e.g. G1_1)</span>
-      <input bind:value={area} required />
+      <span>Area id (e.g. G1_1; type to search by name)</span>
+      <input bind:value={area} required list="create-area" autocomplete="off" spellcheck="false" />
+      <AreaOptions id="create-area" />
     </label>
     <div class="grid3">
       <label class="field"><span>Seed</span><input type="number" min="0" bind:value={seed} placeholder="auto" /></label>

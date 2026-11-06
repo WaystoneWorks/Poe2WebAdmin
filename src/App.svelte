@@ -35,6 +35,8 @@
     page: string;
     label: string;
     icon: IconName;
+    /** Shown in the bottom bar of a phone-width window; the rest are under "More". */
+    primary?: boolean;
   }
   interface NavGroup {
     id: string;
@@ -45,15 +47,15 @@
   }
   // The dashboard, then three groups: people, the world, the server itself.
   const groups: NavGroup[] = [
-    { id: 'home', label: null, folds: false, items: [{ page: 'dashboard', label: 'Dashboard', icon: 'dashboard' }] },
+    { id: 'home', label: null, folds: false, items: [{ page: 'dashboard', label: 'Dashboard', icon: 'dashboard', primary: true }] },
     {
       id: 'people',
       label: 'People',
       folds: false,
       items: [
-        { page: 'players', label: 'Players', icon: 'players' },
+        { page: 'players', label: 'Players', icon: 'players', primary: true },
         { page: 'accounts', label: 'Accounts', icon: 'accounts' },
-        { page: 'characters', label: 'Characters', icon: 'characters' },
+        { page: 'characters', label: 'Characters', icon: 'characters', primary: true },
         { page: 'leagues', label: 'Leagues', icon: 'trophy' },
       ],
     },
@@ -62,7 +64,7 @@
       label: 'World',
       folds: false,
       items: [
-        { page: 'instances', label: 'Instances', icon: 'instances' },
+        { page: 'instances', label: 'Instances', icon: 'instances', primary: true },
         { page: 'schedule', label: 'Schedule', icon: 'calendar' },
       ],
     },
@@ -126,6 +128,13 @@
   });
 
   let announceOpen = $state(false);
+  // Phone width: the pages that are not in the bottom bar, Announce, theme and sign out.
+  let moreOpen = $state(false);
+  const moreCurrent = $derived(nav.some((n) => n.page === page && !n.primary));
+  $effect(() => {
+    void page;
+    moreOpen = false;
+  });
   let message = $state('');
   let sending = $state(false);
 
@@ -160,7 +169,7 @@
   <a class="skip" href="#main">Skip to content</a>
   <div class="window">
     <ShutdownBanner />
-    <div class="body">
+    <div class="shell-body">
       <nav class="side" aria-label="Main">
         <a class="brand" href="#/dashboard" aria-label="PoE2 Admin, dashboard">
           <img src="./logo.png" alt="" width="26" height="26" />
@@ -183,7 +192,7 @@
           {#if showGroup(g)}
             <div id="nav-{g.id}" class="side-items" transition:slide={{ duration: ms(DUR.base), easing: ease }}>
               {#each g.items as n (n.page)}
-                <a href={'#/' + n.page} aria-current={page === n.page ? 'page' : undefined} title={n.label}>
+                <a href={'#/' + n.page} class:secondary={!n.primary} aria-current={page === n.page ? 'page' : undefined} title={n.label}>
                   <Icon name={n.icon} size={16} />
                   <span class="label">{n.label}</span>
                 </a>
@@ -191,6 +200,10 @@
             </div>
           {/if}
         {/each}
+        <button type="button" class="side-more" class:on={moreCurrent} aria-haspopup="dialog" onclick={() => (moreOpen = true)} title="More pages and actions">
+          <Icon name="more" size={18} />
+          <span class="sr-only">More</span>
+        </button>
         <span class="spacer"></span>
         <div class="side-actions">
           <button type="button" class="btn sm" onclick={() => (announceOpen = true)} title="Announce to all players">
@@ -247,6 +260,25 @@
   </div>
 
   <LeaguePopup />
+
+  <Modal bind:open={moreOpen} title="More" icon="more">
+    <nav class="more-list" aria-label="More pages">
+      {#each nav.filter((n) => !n.primary) as n (n.page)}
+        <a href={'#/' + n.page} aria-current={page === n.page ? 'page' : undefined}>
+          <Icon name={n.icon} size={16} /> {n.label}
+        </a>
+      {/each}
+    </nav>
+    <div class="more-actions">
+      <button type="button" class="btn" onclick={() => { moreOpen = false; announceOpen = true; }}>
+        <Icon name="announce" size={14} /> Announce...
+      </button>
+      <ThemeToggle />
+      <span class="grow"></span>
+      <span class="muted small">{auth.account?.username ?? ''}</span>
+      <button type="button" class="btn" onclick={() => auth.logout()}><Icon name="logout" size={14} /> Sign out</button>
+    </div>
+  </Modal>
 
   <Modal bind:open={announceOpen} title="Announce to all players" icon="announce">
     <form onsubmit={announce}>

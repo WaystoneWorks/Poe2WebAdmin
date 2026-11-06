@@ -303,6 +303,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/admin/data/areas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every world area with a name, in table order. */
+        get: operations["areas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/admin/data/league-flags": {
         parameters: {
             query?: never;
@@ -1195,6 +1212,19 @@ export interface components {
         AnnounceRequest: {
             message: string;
         };
+        /** @description A `WorldAreas` row for the area pickers (create instance, transfer). */
+        AreaView: {
+            /** Format: int64 */
+            act: number;
+            /** @description `WorldAreas.Id`, e.g. "G1_1". */
+            id: string;
+            is_hideout: boolean;
+            is_town: boolean;
+            /** Format: int64 */
+            level: number;
+            /** @description `WorldAreas.Name`, e.g. "The Riverbank". */
+            name: string;
+        };
         /** @description `GET /admin/config/backups/{name}`. */
         BackupContent: {
             /** @description The text (token-like values hidden). */
@@ -1273,6 +1303,8 @@ export interface components {
              * @description `Characters.IntegerId` of the class.
              */
             class_id: number;
+            /** @description `Characters.Name` of the class (e.g. "Ranger"), when the game data knows it. */
+            class_name?: string | null;
             /** Format: int64 */
             experience: number;
             /** Format: int32 */
@@ -1770,6 +1802,8 @@ export interface components {
              * @description `Characters.IntegerId` of the character's class.
              */
             class_id?: number | null;
+            /** @description `Characters.Name` of the class (e.g. "Ranger"), when the game data knows it. */
+            class_name?: string | null;
             /**
              * Format: int64
              * @description When the session started (unix seconds).
@@ -3054,6 +3088,49 @@ export interface operations {
                 };
             };
             413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    areas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AreaView"][];
+                };
+            };
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

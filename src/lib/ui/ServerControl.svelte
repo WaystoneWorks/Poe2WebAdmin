@@ -40,7 +40,8 @@
   function ask(k: ShutdownKind) {
     kind = k;
     message = '';
-    delay = '30';
+    // Nobody to warn: no countdown by default.
+    delay = players === 0 ? '0' : '30';
     open = true;
   }
 
@@ -142,9 +143,10 @@
       <Icon name="alert" size={16} />
       <span>
         {#if kind === 'stop'}
-          {players} player{players === 1 ? ' is' : 's are'} in game. They are warned, then disconnected, and the server process exits. It stays off until someone starts it again.
+          {#if players === 0}Nobody is in game.{:else}{players} player{players === 1 ? ' is' : 's are'} in game. They are warned, then disconnected.{/if}
+          The server process exits and stays off until someone starts it again.
         {:else}
-          {players} player{players === 1 ? ' is' : 's are'} in game. They are warned, then disconnected, and can log in again once the server is back (a few seconds).
+          {#if players === 0}Nobody is in game. The server is back in a few seconds.{:else}{players} player{players === 1 ? ' is' : 's are'} in game. They are warned, then disconnected, and can log in again once the server is back (a few seconds).{/if}
         {/if}
       </span>
     </div>

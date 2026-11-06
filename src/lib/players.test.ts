@@ -50,7 +50,8 @@ describe('words', () => {
     expect(connectedFor(1000, 1000 + 3 * 3600 + 120)).toBe('3h 2m');
     expect(connectedFor(1000, 10)).toBe('0s');
     expect(classLevel({ class_id: 3, level: 17 })).toBe('class 3, level 17');
-    expect(classLevel({ class_id: null, level: null })).toBe('-');
+    expect(classLevel({ class_id: 3, class_name: 'Ranger', level: 17 })).toBe('Ranger, level 17');
+    expect(classLevel({ class_id: null, level: null })).toBe('\u2014');
   });
 
   const ban = (over: Partial<Ban>): Ban =>

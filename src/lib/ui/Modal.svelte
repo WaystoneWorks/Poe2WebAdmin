@@ -13,11 +13,16 @@
 
   const titleId = $props.id();
   let dialog: HTMLDialogElement | undefined = $state();
+  // Typed into since it opened: a stray click on the backdrop then does not throw the input away.
+  let edited = false;
 
   // The native <dialog> traps focus, closes on Escape and restores focus to the opener.
   $effect(() => {
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      edited = false;
+      dialog.showModal();
+    }
     else if (!open && dialog.open) dialog.close();
   });
 </script>
@@ -28,8 +33,9 @@
   class:wide
   aria-labelledby={titleId}
   onclose={() => (open = false)}
+  oninput={() => (edited = true)}
   onclick={(e) => {
-    if (e.target === dialog) open = false;
+    if (e.target === dialog && !edited) open = false;
   }}
 >
   {#if open}
@@ -37,6 +43,9 @@
       <div class="dialog-head">
         {#if icon}<span class="dialog-icon" class:danger><Icon name={icon} size={20} /></span>{/if}
         <h2 id={titleId}>{title}</h2>
+        <button type="button" class="btn icon sm ghost dialog-close" aria-label="Close" title="Close (Esc)" onclick={() => (open = false)}>
+          <Icon name="close" size={16} />
+        </button>
       </div>
       {@render children()}
     </div>

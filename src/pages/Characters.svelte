@@ -8,6 +8,7 @@
   import Chip from '../lib/ui/Chip.svelte';
   import Empty from '../lib/ui/Empty.svelte';
   import Spinner from '../lib/ui/Spinner.svelte';
+  import { className } from '../lib/players';
 
   // The account filter lives in the URL (#/characters?account=bob) so the other pages can link to it.
   const account = $derived(router.route.query.get('account') ?? '');
@@ -56,7 +57,7 @@
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th class="num">Id</th><th>Name</th><th>Account</th><th>League</th><th class="num">Level</th><th>Area</th><th>State</th></tr>
+          <tr><th class="num">Id</th><th>Name</th><th>Account</th><th>League</th><th>Class</th><th class="num">Level</th><th>Area</th><th>State</th></tr>
         </thead>
         <tbody>
           {#each res.data as c (c.id)}
@@ -65,6 +66,7 @@
               <td><a href={'#/characters/' + c.id}>{c.name}</a></td>
               <td>{c.account ?? c.account_id}</td>
               <td>{c.league}</td>
+              <td>{className(c) ?? '—'}</td>
               <td class="num">{c.level}</td>
               <td>{c.area}</td>
               <td>{#if c.online}<Chip tone="ok" dot pulse>online</Chip>{:else}<span class="muted">offline</span>{/if}</td>

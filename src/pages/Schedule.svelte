@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { roving } from '../lib/roving';
   import { api, unwrap, errorMessage, type RunView, type TaskBody, type TaskView } from '../lib/api/client';
   import { Resource } from '../lib/resource.svelte';
   import { confirms, run } from '../lib/notify.svelte';
@@ -166,10 +167,12 @@
   <button type="button" class="btn sm icon ghost" onclick={() => res.load()} disabled={res.loading} aria-label="Refresh" title="Refresh"><Icon name="refresh" size={14} /></button>
 </PageHead>
 
-<div class="toolbar">
-  <span class="grow"></span>
-  <button type="button" class="btn primary" onclick={openNew}><Icon name="plus" size={14} /> New task</button>
-</div>
+{#if d?.tasks.length !== 0}
+  <div class="toolbar">
+    <span class="grow"></span>
+    <button type="button" class="btn primary" onclick={openNew}><Icon name="plus" size={14} /> New task</button>
+  </div>
+{/if}
 
 {#if d}
   <p class="zone-line">
@@ -270,7 +273,7 @@
 
     <div class="field">
       <span id="sched-type">When</span>
-      <div class="seg" role="radiogroup" aria-labelledby="sched-type">
+      <div class="seg" role="radiogroup" use:roving aria-labelledby="sched-type">
         {#each [['daily', 'Every day'], ['weekly', 'Days of the week'], ['interval', 'Every N hours'], ['cron', 'Cron']] as [id, label] (id)}
           <button type="button" role="radio" aria-checked={sched.type === id} class:on={sched.type === id} onclick={() => (sched.type = id as typeof sched.type)}>{label}</button>
         {/each}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { roving } from '../roving';
   import { api, unwrap } from '../api/client';
   import { Resource } from '../resource.svelte';
   import { MAX_POINTS, RANGES, formatBytes, formatMicros, formatPercent, pollMs } from '../chart';
@@ -46,7 +47,7 @@
   const players: Series[] = $derived([
     { id: 'players', label: 'Players', color: 'var(--ok)', values: samples.map((s) => s.players), area: true },
     { id: 'occupied', label: 'Busy instances', color: 'var(--info)', values: samples.map((s) => s.occupied), dashed: true },
-    { id: 'instances', label: 'Instances', color: 'var(--violet)', values: samples.map((s) => s.instances), dashed: true },
+    { id: 'instances', label: 'Instances', color: 'var(--muted)', values: samples.map((s) => s.instances), dashed: true },
   ]);
   // A sample without frames (nobody in game) has no frame time: a gap, not a zero.
   const tick: Series[] = $derived([
@@ -54,7 +55,7 @@
     { id: 'max', label: 'Longest', color: 'var(--danger)', values: samples.map((s) => (s.tick_count > 0 ? s.tick_max_us : null)), dashed: true },
   ]);
   const memory: Series[] = $derived([
-    { id: 'rss', label: 'Resident memory', color: 'var(--violet)', values: samples.map((s) => (s.rss_bytes > 0 ? s.rss_bytes / MB : null)), area: true },
+    { id: 'rss', label: 'Resident memory', color: 'var(--gold-2)', values: samples.map((s) => (s.rss_bytes > 0 ? s.rss_bytes / MB : null)), area: true },
   ]);
   const cpu: Series[] = $derived([
     { id: 'cpu', label: 'CPU', color: 'var(--info)', values: samples.map((s) => s.cpu_pct ?? null), area: true },
@@ -65,6 +66,13 @@
   const fmtCount = (v: number) => (Number.isInteger(v) ? String(v) : v.toFixed(1));
   const fmtTick = (us: number) => formatMicros(us);
   const fmtMem = (mb: number) => formatBytes(mb * MB);
+
+  /** "24 h", "90 min": the retention window in its largest whole unit. */
+  function keptFor(secs: number): string {
+    if (secs % 3600 === 0) return `${secs / 3600} h`;
+    if (secs % 60 === 0) return `${secs / 60} min`;
+    return formatUptime(secs);
+  }
 </script>
 
 <section class="card activity" aria-label="Activity over time">
@@ -73,7 +81,7 @@
     <h2>Activity</h2>
     <span class="grow"></span>
     {#if res.loading && !d}<Spinner size={13} />{/if}
-    <div class="seg" role="radiogroup" aria-label="Time range">
+    <div class="seg" role="radiogroup" use:roving aria-label="Time range">
       {#each RANGES as r (r.id)}
         <button type="button" role="radio" aria-checked={rangeId === r.id} class:on={rangeId === r.id} onclick={() => choose(r.id)}>{r.label}</button>
       {/each}
@@ -116,7 +124,7 @@
       </figure>
     </div>
     <p class="hint foot">
-      One sample every {d?.interval_secs ?? 5} s, kept {d ? formatUptime(d.retention_secs) : '-'} in memory (lost on a restart).
+      One sample every {d?.interval_secs ?? 5} s, kept {d ? keptFor(d.retention_secs) : '—'} in memory (lost on a restart).
       {#if range.secs > 3000}Long ranges are merged: players, memory and the longest frame show the peak of each step.{/if}
     </p>
   {/if}
