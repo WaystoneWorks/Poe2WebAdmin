@@ -1,6 +1,6 @@
 # Poe2WebAdmin
 
-The web admin site of the **Path of Exile 2 client 0.5.5e.hotfix1 private server**: a single-page app in **Svelte 5 + Vite + TypeScript** that talks to the server's web API (`crates/poe-web-api` of [Poe2Server](https://github.com/WaystoneWorks/Poe2Server), which serves and packages it; see [web-api.md](https://github.com/WaystoneWorks/Poe2ModdingProject/blob/main/docs/architecture/web-api.md)). In the hub [Poe2ModdingProject](https://github.com/WaystoneWorks/Poe2ModdingProject) it is the submodule `modules/web-admin`.
+The web admin site of the **Path of Exile 2 client 0.5.5f private server**: a single-page app in **Svelte 5 + Vite + TypeScript** that talks to the server's web API (`crates/poe-web-api` of [Poe2Server](https://github.com/WaystoneWorks/Poe2Server), which serves and packages it; see [web-api.md](https://github.com/WaystoneWorks/Poe2ModdingProject/blob/main/docs/architecture/web-api.md)). In the hub [Poe2ModdingProject](https://github.com/WaystoneWorks/Poe2ModdingProject) it is the submodule `modules/web-admin`.
 
 ## Pages
 
