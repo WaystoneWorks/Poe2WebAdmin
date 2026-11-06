@@ -18,7 +18,8 @@
     await tick();
     const pick =
       d.querySelector<HTMLElement>('[autofocus]') ??
-      d.querySelector<HTMLElement>('.dialog-body [role="radio"][aria-checked="true"], .dialog-body input:not([type="hidden"]):not(:disabled), .dialog-body select:not(:disabled), .dialog-body textarea:not(:disabled)') ??
+      d.querySelector<HTMLElement>('.dialog-body [role="radio"][aria-checked="true"]') ??
+      d.querySelector<HTMLElement>('.dialog-body input:not([type="hidden"]):not(:disabled), .dialog-body select:not(:disabled), .dialog-body textarea:not(:disabled)') ??
       d.querySelector<HTMLElement>('.dialog-body button:not(.dialog-close):not(:disabled), .dialog-body a[href]');
     pick?.focus();
   }

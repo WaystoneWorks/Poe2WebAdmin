@@ -10,30 +10,43 @@ class Toasts {
   items = $state<Toast[]>([]);
   private next = 1;
 
-  /** The pointer or focus is on the toasts: they stay until it leaves (then 2 s more). */
+  /** The pointer or focus is on the toasts: their timers stop and go on with the time left after. */
+  private timers = new Map<number, { left: number; started: number; handle: ReturnType<typeof setTimeout> | null }>();
   private held = false;
-  private due: number[] = [];
 
   show(kind: Toast['kind'], text: string): void {
     const id = this.next++;
     this.items = [...this.items, { id, kind, text }];
-    setTimeout(() => this.expire(id), kind === 'error' ? 8000 : 4000);
+    this.timers.set(id, { left: kind === 'error' ? 8000 : 4000, started: 0, handle: null });
+    if (!this.held) this.run(id);
   }
 
   hold(on: boolean): void {
+    if (on === this.held) return;
     this.held = on;
-    if (on) return;
-    const due = this.due;
-    this.due = [];
-    for (const id of due) setTimeout(() => this.expire(id), 2000);
+    const now = Date.now();
+    for (const [id, t] of this.timers) {
+      if (on && t.handle !== null) {
+        clearTimeout(t.handle);
+        t.handle = null;
+        t.left = Math.max(0, t.left - (now - t.started));
+      } else if (!on) {
+        this.run(id);
+      }
+    }
   }
 
-  private expire(id: number): void {
-    if (this.held) this.due.push(id);
-    else this.dismiss(id);
+  private run(id: number): void {
+    const t = this.timers.get(id);
+    if (!t) return;
+    t.started = Date.now();
+    t.handle = setTimeout(() => this.dismiss(id), t.left);
   }
 
   dismiss(id: number): void {
+    const t = this.timers.get(id);
+    if (t?.handle) clearTimeout(t.handle);
+    this.timers.delete(id);
     this.items = this.items.filter((t) => t.id !== id);
   }
 }
