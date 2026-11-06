@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from 'svelte';
   import { roving } from '../lib/roving';
   import Fold from '../lib/ui/Fold.svelte';
   import { api, unwrap, ApiError, type ConfigFile } from '../lib/api/client';
@@ -165,11 +166,20 @@
       reviewing = await unwrap(api.POST('/api/v1/admin/config/validate', { body: { content: draft } }));
       screen = 'review';
       notice = null;
+      // The button that was focused is gone: keyboard users continue at the review.
+      await tick();
+      document.getElementById('cfg-review-title')?.focus();
     } catch (e) {
       notice = e instanceof Error ? e.message : String(e);
     } finally {
       working = false;
     }
+  }
+
+  async function backToEdit() {
+    screen = 'edit';
+    await tick();
+    document.querySelector<HTMLElement>('.cfg-sticky .btn.primary')?.focus();
   }
 
   async function save(restart: boolean) {
@@ -366,7 +376,7 @@
     {/if}
   {:else}
     <section class="card review">
-      <div class="card-head"><span class="head-icon"><Icon name="edit" size={16} /></span><h2>Review changes</h2></div>
+      <div class="card-head"><span class="head-icon"><Icon name="edit" size={16} /></span><h2 id="cfg-review-title" tabindex="-1">Review changes</h2></div>
       {#if reviewing && !reviewing.valid && reviewing.error}
         <div class="notice danger" role="alert">
           <span class="notice-title"><Icon name="alert" size={16} /> The config is not valid, so it cannot be saved</span>
@@ -392,11 +402,11 @@
         </label>
       </div>
       <div class="actions">
-        <button type="button" class="btn" disabled={working} onclick={() => (screen = 'edit')}>Back to editing</button>
-        <button type="button" class="btn primary" disabled={working || !reviewing?.valid} onclick={() => save(false)}><Icon name="save" size={15} /> Save</button>
-        <button type="button" class="btn danger solid" disabled={working || !reviewing?.valid || !delayOk} onclick={() => save(true)}><Icon name="restart" size={15} /> Save and restart</button>
+        <button type="button" class="btn ghost" disabled={working} onclick={backToEdit}>Back to editing</button>
+        <button type="button" class="btn" disabled={working || !reviewing?.valid} onclick={() => save(false)}><Icon name="save" size={15} /> Save</button>
+        <button type="button" class="btn primary" disabled={working || !reviewing?.valid || !delayOk} onclick={() => save(true)}><Icon name="restart" size={15} /> Save and restart</button>
       </div>
-      <p class="hint">The previous file is copied to <code>{f.backup_dir}</code> first. Changes apply at the next start, so Save and restart is what puts them in force.</p>
+      <p class="hint">The previous file is copied to <code>{f.backup_dir}</code> first.</p>
     </section>
   {/if}
 {:else if file.error}

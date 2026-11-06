@@ -10,10 +10,27 @@ class Toasts {
   items = $state<Toast[]>([]);
   private next = 1;
 
+  /** The pointer or focus is on the toasts: they stay until it leaves (then 2 s more). */
+  private held = false;
+  private due: number[] = [];
+
   show(kind: Toast['kind'], text: string): void {
     const id = this.next++;
     this.items = [...this.items, { id, kind, text }];
-    setTimeout(() => this.dismiss(id), kind === 'error' ? 8000 : 4000);
+    setTimeout(() => this.expire(id), kind === 'error' ? 8000 : 4000);
+  }
+
+  hold(on: boolean): void {
+    this.held = on;
+    if (on) return;
+    const due = this.due;
+    this.due = [];
+    for (const id of due) setTimeout(() => this.expire(id), 2000);
+  }
+
+  private expire(id: number): void {
+    if (this.held) this.due.push(id);
+    else this.dismiss(id);
   }
 
   dismiss(id: number): void {

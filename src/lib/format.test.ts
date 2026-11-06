@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatAge, formatUptime, intOrNull } from './format';
+import { formatAge, formatClock, formatUnix, formatUptime, intOrNull } from './format';
 
 describe('format', () => {
   it('formats uptime compactly', () => {
@@ -19,5 +19,14 @@ describe('format', () => {
     expect(intOrNull('-1')).toBeNaN();
     expect(intOrNull('1.5')).toBeNaN();
     expect(intOrNull('x')).toBeNaN();
+  });
+});
+
+describe('dates', () => {
+  it('writes one 24 h style', () => {
+    const secs = new Date(2026, 10, 5, 8, 4, 9).getTime() / 1000;
+    expect(formatUnix(secs)).toBe('2026-11-05 08:04');
+    expect(formatUnix(null)).toBe('—');
+    expect(formatClock(new Date(2026, 10, 5, 20, 4, 9))).toBe('20:04:09');
   });
 });

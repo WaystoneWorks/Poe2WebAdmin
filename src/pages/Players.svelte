@@ -271,7 +271,7 @@
                 <td title={s.area}>{areas.name(s.area)}</td>
                 <td class="num">{s.instance ?? '—'}</td>
                 <td title={formatUnix(s.connected_at)}>{connectedFor(s.connected_at, nowSecs)}</td>
-                <td>{#if s.ip}<code>{s.ip}</code>{:else}<span class="muted">-</span>{/if}</td>
+                <td>{#if s.ip}<code>{s.ip}</code>{:else}<span class="muted">—</span>{/if}</td>
                 <td>
                   <div class="row-actions">
                     {#if s.muted}
@@ -369,11 +369,11 @@
   </form>
 </Modal>
 
-<Modal bind:open={unlockOpen} title={`Waypoints of ${unlockFor ?? ''}`}>
+<Modal bind:open={unlockOpen} title={`Unlock waypoints for ${unlockFor ?? ''}`} icon="instances">
   <form onsubmit={submitUnlock}>
     <div class="field">
       <span id="unlock-what">Which</span>
-      <div class="seg" role="radiogroup" aria-labelledby="unlock-what">
+      <div class="seg" role="radiogroup" use:roving aria-labelledby="unlock-what">
         <button type="button" role="radio" aria-checked={unlockWhat === 'all'} class:on={unlockWhat === 'all'} onclick={() => (unlockWhat = 'all')}>All acts and interludes</button>
         <button type="button" role="radio" aria-checked={unlockWhat === 'act'} class:on={unlockWhat === 'act'} onclick={() => (unlockWhat = 'act')}>One act</button>
         <button type="button" role="radio" aria-checked={unlockWhat === 'waypoint'} class:on={unlockWhat === 'waypoint'} onclick={() => (unlockWhat = 'waypoint')}>One waypoint</button>
@@ -381,11 +381,16 @@
     </div>
     {#if unlockWhat !== 'all'}
       <label class="field">
-        <span>{unlockWhat === 'act' ? 'Act (1-4; 6 = the interludes)' : 'Area id (G1_4)'}</span>
-        <input bind:value={unlockValue} aria-invalid={unlockBad} />
+        <span>{unlockWhat === 'act' ? 'Act: 1 to 4, or 6 for the interludes' : 'Waypoint area id (e.g. G1_4; type to search by name)'}</span>
+        {#if unlockWhat === 'act'}
+          <input bind:value={unlockValue} aria-invalid={unlockBad} inputmode="numeric" />
+        {:else}
+          <input bind:value={unlockValue} aria-invalid={unlockBad} list="unlock-area" autocomplete="off" spellcheck="false" />
+          <AreaOptions id="unlock-area" />
+        {/if}
       </label>
     {/if}
-    <label class="field"><span><input type="checkbox" bind:checked={unlockLock} /> Lock instead</span></label>
+    <label class="check"><input type="checkbox" bind:checked={unlockLock} /> Lock instead (remove the waypoints)</label>
     <div class="actions">
       <button type="button" class="btn" onclick={() => (unlockOpen = false)}>Cancel</button>
       <button type="submit" class="btn primary" disabled={unlockBad}>{unlockLock ? 'Lock' : 'Unlock'}</button>

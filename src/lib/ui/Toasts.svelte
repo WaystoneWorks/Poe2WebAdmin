@@ -7,10 +7,20 @@
   import Icon from './Icon.svelte';
 </script>
 
-<div class="toasts" role="status" aria-live="polite">
+<!-- A polite live region that is always there; an error is an alert. Hovering or focusing a toast keeps it. -->
+<div
+  class="toasts"
+  role="status"
+  aria-live="polite"
+  onmouseenter={() => toasts.hold(true)}
+  onmouseleave={() => toasts.hold(false)}
+  onfocusin={() => toasts.hold(true)}
+  onfocusout={() => toasts.hold(false)}
+>
   {#each toasts.items as t (t.id)}
     <div
       class="toast {t.kind}"
+      role={t.kind === 'error' ? 'alert' : undefined}
       in:fly={{ x: 40, duration: ms(260), easing: cubicOut }}
       out:fade={{ duration: ms(160) }}
       animate:flip={{ duration: ms(200) }}

@@ -200,9 +200,10 @@
             </div>
           {/if}
         {/each}
-        <button type="button" class="side-more" class:on={moreCurrent} aria-haspopup="dialog" onclick={() => (moreOpen = true)} title="More pages and actions">
-          <Icon name="more" size={18} />
-          <span class="sr-only">More</span>
+        <button type="button" class="side-more" class:on={moreCurrent} aria-haspopup="dialog" onclick={() => (moreOpen = true)} title="More pages and actions"
+          aria-label={moreCurrent ? `More (current: ${nav.find((n) => n.page === page)?.label})` : 'More'}>
+          <Icon name="more" size={16} />
+          <span aria-hidden="true">More</span>
         </button>
         <span class="spacer"></span>
         <div class="side-actions">

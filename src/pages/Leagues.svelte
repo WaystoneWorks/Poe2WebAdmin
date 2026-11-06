@@ -142,11 +142,13 @@
           <ul class="rows">
             {#each f.rows as r (r.id)}
               <li class:dim={r.state !== 'active'}>
-                <b>{r.display_name}</b>
-                {#if r.is_default}<Chip tone="accent">DEFAULT</Chip>{/if}
-                {#if variantTag(r)}<Chip>{variantTag(r)}</Chip>{/if}
-                {#if r.permanent && !r.hardcore && !r.ssf}<Chip tone="info">PERMANENT</Chip>{/if}
-                <Chip tone={r.state === 'active' ? 'ok' : r.state === 'hidden' ? 'warn' : 'neutral'}>{r.state.toUpperCase()}</Chip>
+                <span class="tags">
+                  <b>{r.display_name}</b>
+                  {#if r.is_default}<Chip tone="accent">DEFAULT</Chip>{/if}
+                  {#if variantTag(r)}<Chip>{variantTag(r)}</Chip>{/if}
+                  {#if r.permanent && !r.hardcore && !r.ssf}<Chip tone="info">PERMANENT</Chip>{/if}
+                  <Chip tone={r.state === 'active' ? 'ok' : r.state === 'hidden' ? 'warn' : 'neutral'}>{r.state.toUpperCase()}</Chip>
+                </span>
                 <span class="muted count">{r.characters} character{r.characters === 1 ? '' : 's'}</span>
                 <span class="grow"></span>
                 {#if r.state !== 'ended'}
@@ -250,6 +252,7 @@
   .rows li { display: flex; align-items: center; gap: var(--sp-2); padding: 6px 0; border-top: 1px solid var(--line-soft); }
   .rows li:first-child { border-top: 0; }
   .rows li.dim b { color: var(--muted); }
+  .tags { display: inline-flex; align-items: center; flex-wrap: wrap; gap: var(--sp-2); }
   .count { font-size: 12.5px; }
   .grow { flex: 1; }
   .small { font-size: 12.5px; margin: 2px 0; }
@@ -262,6 +265,8 @@
     .league { flex-direction: column; }
     .banner-box { width: 100%; min-height: 56px; max-height: 96px; }
     .rows li { flex-wrap: wrap; row-gap: 4px; }
+    .league { align-items: stretch; }
+    .tags { flex: 1 1 100%; }
     .rows li .grow { display: none; }
     .rows li .btn { margin-left: auto; }
   }

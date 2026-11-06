@@ -255,6 +255,7 @@ dialog.modal::backdrop { background: rgb(5 2 2 / 0.65); animation: fade-in var(-
 .toast-text { flex: 1 1 auto; padding-top: 2px; overflow-wrap: anywhere; }
 .toast-timer { position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; transform-origin: left; animation: timer linear forwards; }
 .toast.ok .toast-timer { background: var(--ok); }
+.toasts:hover .toast-timer, .toasts:focus-within .toast-timer { animation-play-state: paused; }
 .toast.error .toast-timer { background: var(--danger); }
 
 /* ---------------------------------------------------------------- shell */
@@ -294,7 +295,7 @@ button.side-group[aria-expanded='false'] .icon { transform: rotate(-90deg); }
 .who span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 main { position: relative; min-width: 0; overflow-y: auto; overflow-x: hidden; padding: 28px 32px 32px; }
-main:focus { outline: none; }
+main:focus, h2[tabindex='-1']:focus { outline: none; }
 .page { animation: page-in var(--dur-page) var(--ease) both; max-width: 1180px; margin: 0 auto; }
 .page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px; margin-bottom: 20px; }
 .page-title { min-width: 0; }
@@ -458,11 +459,15 @@ textarea.code { display: block; width: 100%; min-height: 380px; height: calc(100
   .side .side-items { display: contents; }
   .toolbar .search { flex: 1 1 100%; min-width: 0; }
   .side-group, .side a.secondary { display: none; }
-  .side-more { display: flex; flex: 1 0 44px; align-items: center; justify-content: center; padding: 10px 0; border: 0; border-radius: var(--radius-sm); background: none; color: var(--faint); cursor: pointer; }
-  .side-more.on { color: var(--gold); box-shadow: inset 0 2px 0 var(--gold); }
+  .side-more { display: flex; flex: 1 0 44px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 7px 0 5px; border: 0; border-radius: var(--radius-sm); background: none; color: var(--muted); font: 500 10.5px/1.2 var(--font); cursor: pointer; }
+  .side-more .icon { color: var(--faint); }
+  .side-more.on { color: var(--gold-2); background: var(--selected-bg); box-shadow: inset 0 2px 0 var(--gold); }
+  .side-more.on .icon { color: var(--gold); }
+  /* phone bar: a small label under each icon */
+  .side a span.label { position: static; width: auto; height: auto; overflow: visible; clip-path: none; font-size: 10.5px; line-height: 1.2; }
   main { grid-row: 1; padding: 14px 12px 20px; }
   .side { grid-row: 2; flex-direction: row; justify-content: space-between; padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); border-right: 0; border-top: 1px solid var(--line-soft); overflow-x: auto; overflow-y: hidden; gap: 2px; }
-  .side a { flex: 1 0 44px; padding: 10px 0; }
+  .side a { flex: 1 0 44px; flex-direction: column; gap: 3px; padding: 7px 0 5px; }
   .side a[aria-current='page'] { box-shadow: inset 0 2px 0 var(--gold); }
   .side .spacer, .side .brand, .side-actions, .side-foot { display: none; }
   .page-head { margin-bottom: 16px; }
@@ -479,6 +484,9 @@ textarea.code { display: block; width: 100%; min-height: 380px; height: calc(100
   th, td { padding: 9px 10px; }
   .cfg-bar { top: -14px; }
   .cfg-sticky { bottom: -20px; }
+  .cfg-sticky > .chip { display: none; } /* the bar itself says there are changes */
+  .cfg-sticky .grow { display: none; }
+  .cfg-sticky .btn { flex: 1 1 0; justify-content: center; }
   .dl { grid-template-columns: 34px 34px 16px minmax(0, 1fr); }
   .kv { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .kv dd { margin-bottom: 8px; }

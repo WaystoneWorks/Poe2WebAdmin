@@ -36,6 +36,8 @@
     }
     busy = false;
   }
+  const shortPw = $derived(password !== '' && password.length < 8);
+  const mismatch = $derived(password2 !== '' && password !== password2);
 </script>
 
 <div class="login-wrap">
@@ -52,10 +54,15 @@
       <!-- svelte-ignore a11y_autofocus -->
       <input autocomplete="username" autofocus required bind:value={username} />
     </label>
-    <label class="field"><span>Password <span class="muted">(at least 8 characters)</span></span><input type="password" autocomplete="new-password" required bind:value={password} /></label>
+    <label class="field">
+      <span>Password <span class="muted">(at least 8 characters)</span></span>
+      <input type="password" autocomplete="new-password" required bind:value={password} aria-invalid={shortPw} aria-describedby={shortPw ? 'pw-short' : undefined} />
+      {#if shortPw}<span class="err" id="pw-short">{8 - password.length} more character{8 - password.length === 1 ? '' : 's'} needed.</span>{/if}
+    </label>
     <label class="field">
       <span>Repeat the password</span>
-      <input type="password" autocomplete="new-password" required bind:value={password2} aria-invalid={password2 !== '' && password !== password2} />
+      <input type="password" autocomplete="new-password" required bind:value={password2} aria-invalid={mismatch} aria-describedby={mismatch ? 'pw-mismatch' : undefined} />
+      {#if mismatch}<span class="err" id="pw-mismatch" role="alert">The passwords do not match.</span>{/if}
     </label>
     <button type="submit" class="btn primary lg" disabled={busy || !valid}>
       {#if busy}<Spinner size={14} /> Creating...{:else}Create admin and sign in{/if}

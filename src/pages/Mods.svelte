@@ -27,7 +27,7 @@
   {/if}
   {#if !res.data.active}
     <Empty icon="mods" title="The mod system is off">
-      Create the mods folder's <code>state.toml</code> with <code>poe-server mod enable &lt;id&gt;</code>, then restart the server.
+      Turn a mod on with <code>poe-server mod enable &lt;id&gt;</code> (this writes the mods folder's <code>state.toml</code>), then restart the server.
     </Empty>
   {:else if res.data.mods.length === 0}
     <Empty icon="mods" title="No mods installed">Install a package with <code>poe-server mod install &lt;zip&gt; --enable</code>.</Empty>

@@ -162,7 +162,7 @@
       <input id="delay" type="number" min="0" max={MAX_DELAY} step="1" inputmode="numeric" bind:value={delay} aria-invalid={delayBad} />
       <div class="quick" role="group" aria-label="Common countdowns">
         {#each QUICK as q (q.secs)}
-          <button type="button" class:on={delayText === String(q.secs)} onclick={() => (delay = String(q.secs))}>{q.label}</button>
+          <button type="button" class:on={delayText === String(q.secs)} aria-pressed={delayText === String(q.secs)} onclick={() => (delay = String(q.secs))}>{q.label}</button>
         {/each}
       </div>
       {#if delayBad}<span class="err" role="alert">A whole number of seconds from 0 to {MAX_DELAY}.</span>{/if}

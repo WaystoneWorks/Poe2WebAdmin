@@ -13,12 +13,12 @@
 
   const titleId = $props.id();
   let dialog: HTMLDialogElement | undefined = $state();
-  /** First focus: an `autofocus` element, else the first field, else the first button after the X. */
+  /** First focus: an `autofocus` element, else the first field (a chosen radio counts), else the first button after the X. */
   async function focusFirst(d: HTMLDialogElement) {
     await tick();
     const pick =
       d.querySelector<HTMLElement>('[autofocus]') ??
-      d.querySelector<HTMLElement>('.dialog-body input:not([type="hidden"]):not(:disabled), .dialog-body select:not(:disabled), .dialog-body textarea:not(:disabled)') ??
+      d.querySelector<HTMLElement>('.dialog-body [role="radio"][aria-checked="true"], .dialog-body input:not([type="hidden"]):not(:disabled), .dialog-body select:not(:disabled), .dialog-body textarea:not(:disabled)') ??
       d.querySelector<HTMLElement>('.dialog-body button:not(.dialog-close):not(:disabled), .dialog-body a[href]');
     pick?.focus();
   }

@@ -9,8 +9,18 @@ export function formatUptime(secs: number): string {
   return `${s}s`;
 }
 
+const pad2 = (n: number) => String(n).padStart(2, '0');
+
+/** `2026-11-10 18:00` in local time: the one date style of the admin site. Em dash when unset. */
 export function formatUnix(secs: number | null | undefined): string {
-  return secs ? new Date(secs * 1000).toLocaleString() : '—';
+  if (!secs) return '—';
+  const d = new Date(secs * 1000);
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+}
+
+/** `18:04:09` in local time, 24 h. */
+export function formatClock(d: Date): string {
+  return `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
 }
 
 export function formatAge(ms: number, now = Date.now()): string {

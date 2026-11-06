@@ -11,6 +11,23 @@
   const verb = $derived(p?.action === 'stop' ? 'Stop' : 'Restart');
   const pct = $derived(p && p.delay_secs > 0 ? (server.remaining / p.delay_secs) * 100 : 0);
   let cancelling = $state(false);
+  // What screen readers hear: one line per change of phase (the ticking countdown is not live).
+  const spoken = $derived.by(() => {
+    switch (server.phase) {
+      case 'counting':
+        return p ? `${verb} scheduled in ${countdownText(p.delay_secs)}${p.message ? `: ${p.message}` : ''}` : '';
+      case 'draining':
+        return `${verb === 'Stop' ? 'Stopping' : 'Restarting'} now. Players are being disconnected.`;
+      case 'restarting':
+        return 'The server is restarting.';
+      case 'stopped':
+        return 'The server has stopped.';
+      case 'unreachable':
+        return 'Cannot reach the server.';
+      default:
+        return '';
+    }
+  });
 
   async function cancel() {
     cancelling = true;
@@ -20,10 +37,10 @@
   }
 </script>
 
+<span class="sr-only" role="status">{spoken}</span>
+
 {#if server.phase === 'counting' && p}
   <div class="banner warn">
-    <!-- Screen readers hear the scheduled action once; the ticking countdown is not live. -->
-    <span class="sr-only" role="status">{verb} scheduled in {countdownText(p.delay_secs)}{#if p.message}: {p.message}{/if}</span>
     <Icon name="clock" size={18} />
     <span aria-hidden="true"><strong>{verb} in {countdownText(server.remaining)}</strong>{#if p.message}: {p.message}{/if}
       <span class="muted">(asked by {p.requested_by})</span></span>
@@ -33,22 +50,22 @@
     </span>
   </div>
 {:else if server.phase === 'draining'}
-  <div class="banner warn" role="status">
+  <div class="banner warn">
     <Spinner size={16} />
     <span><strong>{verb === 'Stop' ? 'Stopping' : 'Restarting'} now.</strong> Players are being disconnected.</span>
   </div>
 {:else if server.phase === 'restarting'}
-  <div class="banner warn" role="status">
+  <div class="banner warn">
     <Spinner size={16} />
     <span><strong>The server is restarting.</strong> This page reconnects by itself.</span>
   </div>
 {:else if server.phase === 'stopped'}
-  <div class="banner danger" role="status">
+  <div class="banner danger">
     <Icon name="power" size={18} />
     <span><strong>The server has stopped.</strong> This page reconnects by itself if it is started again.</span>
   </div>
 {:else if server.phase === 'unreachable'}
-  <div class="banner danger" role="status">
+  <div class="banner danger">
     <Icon name="wifi" size={18} />
     <span><strong>Cannot reach the server.</strong> Retrying...</span>
   </div>

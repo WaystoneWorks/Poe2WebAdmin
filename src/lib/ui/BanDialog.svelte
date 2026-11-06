@@ -133,7 +133,8 @@
       <input id="ban-length" bind:value={lengthText} disabled={permanent} aria-invalid={lengthBad} placeholder="7d" autocomplete="off" />
       <div class="quick" role="group" aria-label="Common lengths">
         {#each BAN_QUICK as q (q.label)}
-          <button type="button" class:on={q.secs === null ? permanent : !permanent && secs === q.secs} onclick={() => pick(q.secs)}>{q.label}</button>
+          {@const on = q.secs === null ? permanent : !permanent && secs === q.secs}
+          <button type="button" class:on aria-pressed={on} onclick={() => pick(q.secs)}>{q.label}</button>
         {/each}
       </div>
       {#if lengthBad}

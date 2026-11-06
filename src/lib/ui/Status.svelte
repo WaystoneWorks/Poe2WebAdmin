@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { formatClock } from '../format';
   import type { Resource } from '../resource.svelte';
   import Spinner from './Spinner.svelte';
 
@@ -9,7 +10,7 @@
   {#if res.error}
     <span class="err" role="alert">{res.error}</span>
   {:else if res.updated}
-    <span class="muted">Updated {res.updated.toLocaleTimeString()}</span>
+    <span class="muted">Updated {formatClock(res.updated)}</span>
   {:else}
     <span class="muted"><Spinner size={12} /> Loading</span>
   {/if}
