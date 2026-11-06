@@ -10,7 +10,7 @@ export function formatUptime(secs: number): string {
 }
 
 export function formatUnix(secs: number | null | undefined): string {
-  return secs ? new Date(secs * 1000).toLocaleString() : '-';
+  return secs ? new Date(secs * 1000).toLocaleString() : '—';
 }
 
 export function formatAge(ms: number, now = Date.now()): string {

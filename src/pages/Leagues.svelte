@@ -145,12 +145,12 @@
                 <b>{r.display_name}</b>
                 {#if r.is_default}<Chip tone="accent">DEFAULT</Chip>{/if}
                 {#if variantTag(r)}<Chip>{variantTag(r)}</Chip>{/if}
-                <Chip tone={r.state === 'active' ? 'ok' : r.state === 'hidden' ? 'warn' : 'neutral'}>{r.state.toUpperCase()}</Chip>
                 {#if r.permanent && !r.hardcore && !r.ssf}<Chip tone="info">PERMANENT</Chip>{/if}
+                <Chip tone={r.state === 'active' ? 'ok' : r.state === 'hidden' ? 'warn' : 'neutral'}>{r.state.toUpperCase()}</Chip>
                 <span class="muted count">{r.characters} character{r.characters === 1 ? '' : 's'}</span>
                 <span class="grow"></span>
                 {#if r.state !== 'ended'}
-                  <button type="button" class="btn sm ghost" onclick={() => toggleHidden(r)}>{r.state === 'hidden' ? 'Show' : 'Hide'}</button>
+                  <button type="button" class="btn sm ghost" aria-label="{r.state === 'hidden' ? 'Show' : 'Hide'} {r.display_name}" onclick={() => toggleHidden(r)}>{r.state === 'hidden' ? 'Show' : 'Hide'}</button>
                 {/if}
               </li>
             {/each}
@@ -194,7 +194,7 @@
       </label>
       <ul class="mapping">
         {#each moves as m (m.from.id)}
-          <li>{m.from.display_name} <Icon name="chevron" size={11} /> <b>{m.to ? m.to.display_name : 'no matching league'}</b> <span class="muted">({m.from.characters})</span></li>
+          <li>{m.from.display_name} <Icon name="arrow" size={13} /> <b>{m.to ? m.to.display_name : 'no matching league'}</b> <span class="muted">({m.from.characters} character{m.from.characters === 1 ? '' : 's'})</span></li>
         {/each}
       </ul>
       <p class="hint"><b>{moveCount}</b> character{moveCount === 1 ? '' : 's'} will move. This cannot be undone.</p>
@@ -217,16 +217,26 @@
       A league can only be deleted while it has no characters.
     </p>
     {#if delCount > 0}
-      <div class="notice danger" role="alert"><span class="notice-title"><Icon name="alert" size={16} /> {delCount} character{delCount === 1 ? '' : 's'} still in it. End the league to move them first.</span></div>
+      {@const base = fams.find((f) => f.base.family === delRow?.family)?.base}
+      <div class="notice danger" role="alert"><span class="notice-title"><Icon name="alert" size={16} /> {delCount} character{delCount === 1 ? ' is' : 's are'} still in it.</span>
+        {#if base && !base.permanent && base.state !== 'ended'}<p class="muted">End the league to move them into another one first.</p>{:else}<p class="muted">Move them to another league from their character pages first.</p>{/if}
+      </div>
+      <div class="actions">
+        <button type="button" class="btn" onclick={() => (delOpen = false)}>Close</button>
+        {#if base && !base.permanent && base.state !== 'ended'}
+          <button type="button" class="btn" onclick={() => { delOpen = false; openEnd(base); }}>End league...</button>
+        {/if}
+      </div>
+    {:else}
+      <label class="field">
+        <span>Type <b>{delRow?.id}</b> to confirm</span>
+        <input bind:value={delTyped} autocomplete="off" />
+      </label>
+      <div class="actions">
+        <button type="button" class="btn" onclick={() => (delOpen = false)}>Cancel</button>
+        <button type="submit" class="btn danger solid" disabled={busy || delTyped !== delRow?.id}>Delete</button>
+      </div>
     {/if}
-    <label class="field">
-      <span>Type <b>{delRow?.id}</b> to confirm</span>
-      <input bind:value={delTyped} autocomplete="off" disabled={delCount > 0} />
-    </label>
-    <div class="actions">
-      <button type="button" class="btn" onclick={() => (delOpen = false)}>Cancel</button>
-      <button type="submit" class="btn danger solid" disabled={busy || delCount > 0 || delTyped !== delRow?.id}>Delete</button>
-    </div>
   </form>
 </Modal>
 
@@ -246,5 +256,13 @@
   .row-actions.left { justify-content: flex-start; margin-top: 10px; }
   .tag-soon { margin-left: 6px; font-size: 11px; color: var(--warn); font-weight: 600; }
   .mapping { list-style: none; margin: 0 0 10px; padding: 0; font-size: 13px; }
-  .mapping li { padding: 3px 0; }
+  .mapping li { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; padding: 3px 0; }
+  .mapping li :global(svg) { color: var(--muted); }
+  @media (max-width: 640px) {
+    .league { flex-direction: column; }
+    .banner-box { width: 100%; min-height: 56px; max-height: 96px; }
+    .rows li { flex-wrap: wrap; row-gap: 4px; }
+    .rows li .grow { display: none; }
+    .rows li .btn { margin-left: auto; }
+  }
 </style>

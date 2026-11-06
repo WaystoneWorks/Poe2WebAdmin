@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { tick, type Snippet } from 'svelte';
   import Icon, { type IconName } from './Icon.svelte';
 
   let {
@@ -13,6 +13,16 @@
 
   const titleId = $props.id();
   let dialog: HTMLDialogElement | undefined = $state();
+  /** First focus: an `autofocus` element, else the first field, else the first button after the X. */
+  async function focusFirst(d: HTMLDialogElement) {
+    await tick();
+    const pick =
+      d.querySelector<HTMLElement>('[autofocus]') ??
+      d.querySelector<HTMLElement>('.dialog-body input:not([type="hidden"]):not(:disabled), .dialog-body select:not(:disabled), .dialog-body textarea:not(:disabled)') ??
+      d.querySelector<HTMLElement>('.dialog-body button:not(.dialog-close):not(:disabled), .dialog-body a[href]');
+    pick?.focus();
+  }
+
   // Typed into since it opened: a stray click on the backdrop then does not throw the input away.
   let edited = false;
 
@@ -22,6 +32,7 @@
     if (open && !dialog.open) {
       edited = false;
       dialog.showModal();
+      void focusFirst(dialog);
     }
     else if (!open && dialog.open) dialog.close();
   });

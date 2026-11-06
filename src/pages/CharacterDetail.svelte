@@ -10,6 +10,7 @@
   import Spinner from '../lib/ui/Spinner.svelte';
   import MoveLeagueDialog from '../lib/ui/MoveLeagueDialog.svelte';
   import { className } from '../lib/players';
+  import { areas } from '../lib/areas.svelte';
 
   let { id }: { id: string } = $props();
 
@@ -35,7 +36,7 @@
         <dt>Id</dt><dd>{c.id}</dd>
         <dt>Name</dt><dd>{c.name}</dd>
         <dt>Account</dt><dd>{c.account ?? '—'} <span class="muted">(#{c.account_id})</span></dd>
-        <dt>League</dt><dd>{c.league} <button class="btn sm" onclick={() => (moveOpen = true)}><Icon name="transfer" size={13} /> Move league</button></dd>
+        <dt>League</dt><dd class="with-btn">{c.league} <button class="btn sm" onclick={() => (moveOpen = true)}><Icon name="transfer" size={13} /> Move league</button></dd>
         <dt>Class</dt><dd>{className(c) ?? '—'} <span class="muted">(id {c.class_id})</span></dd>
         <dt>Level</dt><dd>{c.level}</dd>
         <dt>Experience</dt><dd>{c.experience.toLocaleString()}</dd>
@@ -45,14 +46,14 @@
     <section class="card">
       <div class="card-head"><span class="head-icon"><Icon name="instances" size={16} /></span><h2>Location</h2></div>
       <dl class="kv">
-        <dt>Area</dt><dd>{c.area}</dd>
+        <dt>Area</dt><dd>{areas.name(c.area)} <span class="muted">({c.area})</span></dd>
         <dt>Start state</dt><dd>{c.start_state}</dd>
         <dt>Intro done</dt><dd>{c.intro_done ? 'yes' : 'no'}</dd>
         {#if c.location}
           <dt>Saved seed</dt><dd>{c.location.seed}</dd>
           <dt>Saved position</dt><dd>{c.location.x}, {c.location.y}</dd>
         {:else}
-          <dt>Saved position</dt><dd class="muted">none</dd>
+          <dt>Saved position</dt><dd class="muted">not saved yet</dd>
         {/if}
       </dl>
     </section>
@@ -69,3 +70,7 @@
 {:else}
   <div class="loading"><Spinner size={20} /> Loading...</div>
 {/if}
+
+<style>
+  .with-btn { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+</style>

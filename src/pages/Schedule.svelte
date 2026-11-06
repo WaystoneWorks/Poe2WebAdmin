@@ -200,13 +200,13 @@
                 <b>{t.name}</b>
                 <div class="muted small">{t.problem ? t.problem : t.task_text}</div>
               </td>
-              <td>{t.schedule_text ?? '-'}</td>
+              <td>{t.schedule_text ?? '—'}</td>
               <td>
                 {#if t.next_run_at}
                   <span title={at(t.next_run_at)}>{relativeFuture(t.next_run_at, now)}</span>
                   <div class="muted small">{at(t.next_run_at)}</div>
                 {:else}
-                  <span class="muted">{t.enabled ? '-' : 'off'}</span>
+                  <span class="muted">{t.enabled ? '—' : 'off'}</span>
                 {/if}
               </td>
               <td>
@@ -356,7 +356,7 @@
             <tr>
               <td>{at(r.due_at)}</td>
               <td><Chip tone={statusTone(r.status)}>{statusLabel(r.status)}</Chip></td>
-              <td>{r.message || '-'}</td>
+              <td>{r.message || '—'}</td>
             </tr>
           {/each}
         </tbody>

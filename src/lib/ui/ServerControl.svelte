@@ -140,7 +140,7 @@
 <Modal bind:open title={kind === 'stop' ? 'Stop the server?' : 'Restart the server?'} icon={kind === 'stop' ? 'stop' : 'restart'} danger={kind === 'stop'}>
   <form onsubmit={submit}>
     <div class="dialog-note" class:danger={kind === 'stop'}>
-      <Icon name="alert" size={16} />
+      <Icon name={kind === 'restart' && players === 0 ? 'info' : 'alert'} size={16} />
       <span>
         {#if kind === 'stop'}
           {#if players === 0}Nobody is in game.{:else}{players} player{players === 1 ? ' is' : 's are'} in game. They are warned, then disconnected.{/if}

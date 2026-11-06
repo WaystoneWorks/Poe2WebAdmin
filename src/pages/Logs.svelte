@@ -21,6 +21,7 @@
   let autoscroll = $state(true);
   let pending = $state(0); // lines that arrived while paused
   let conn = $state<SocketState>('connecting');
+  const CONN_TEXT: Record<SocketState, string> = { connecting: 'connecting...', open: 'live', reconnecting: 'reconnecting...', closed: 'disconnected' };
   let retryInfo = $state('');
   let notice = $state<string | null>(null);
   let scroller: HTMLDivElement | undefined = $state();
@@ -140,7 +141,7 @@
 <PageHead title="Live logs" subtitle="Server log events, newest at the bottom" icon="logs">
   <span class="conn" role="status">
     <Chip tone={conn === 'open' ? 'ok' : conn === 'closed' ? 'bad' : 'warn'} dot pulse={conn !== 'closed'}>
-      {conn}{retryInfo ? ` (${retryInfo})` : ''}
+      {CONN_TEXT[conn]}{retryInfo ? ` (${retryInfo})` : ''}
     </Chip>
   </span>
 </PageHead>
@@ -160,12 +161,14 @@
     <span>Search</span>
     <input type="search" placeholder="message or field text" bind:value={text} />
   </label>
-  <button type="button" class="btn sm" onclick={togglePause} aria-pressed={paused}>
-    <Icon name={paused ? 'play' : 'pause'} size={13} />
-    {paused ? `Resume${pending ? ` (${pending} new)` : ''}` : 'Pause'}
-  </button>
-  <label class="check"><input type="checkbox" bind:checked={autoscroll} /> Autoscroll</label>
-  <button type="button" class="btn sm" onclick={clearView}><Icon name="trash" size={13} /> Clear</button>
+  <span class="log-actions">
+    <button type="button" class="btn sm" onclick={togglePause} aria-pressed={paused}>
+      <Icon name={paused ? 'play' : 'pause'} size={13} />
+      {paused ? `Resume${pending ? ` (${pending} new)` : ''}` : 'Pause'}
+    </button>
+    <label class="check"><input type="checkbox" bind:checked={autoscroll} /> Autoscroll</label>
+    <button type="button" class="btn sm" onclick={clearView}><Icon name="trash" size={13} /> Clear</button>
+  </span>
 </form>
 
 {#if notice}
@@ -189,3 +192,7 @@
 <p class="muted log-foot">
   {view.length} lines shown (at most {CAP} kept){store.dropped ? `, ${store.dropped} older dropped` : ''}{paused ? ', paused' : ''}
 </p>
+
+<style>
+  .log-actions { display: inline-flex; align-items: center; gap: var(--sp-3); flex-wrap: nowrap; }
+</style>

@@ -398,6 +398,7 @@ td .switch { vertical-align: middle; }
 .chart-box figcaption .muted { font-size: 12px; }
 
 /* config editor */
+.cfg-sticky { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; position: sticky; bottom: -32px; z-index: 5; margin-top: 16px; padding: 12px 0; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); border-top: 1px solid var(--line-soft); animation: fade-in var(--dur) var(--ease); }
 .cfg-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; position: sticky; top: -24px; z-index: 5; padding: 10px 0; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); }
 .cfg-groups { display: grid; gap: 18px; }
 .cfg-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 16px 22px; }
@@ -443,15 +444,19 @@ textarea.code { display: block; width: 100%; min-height: 380px; height: calc(100
   .shell-body { grid-template-columns: 64px minmax(0, 1fr); }
   .side { padding: 12px 8px; }
   .side a { justify-content: center; padding: 10px 0; }
-  .side a span.label, .brand-text, .side-group, .who, .side-actions .label { display: none; }
+  .brand-text, .side-group, .who { display: none; }
+  /* icon rail: the labels stay for screen readers */
+  .side a span.label, .side-actions .label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .side-actions .btn { justify-content: center; padding: 0; }
   .side-foot { flex-direction: column; }
   main { padding: 18px 16px 24px; }
+  .cfg-sticky { bottom: -24px; }
   .grid3, .grid2 { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 640px) {
   .shell-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
   .side .side-items { display: contents; }
+  .toolbar .search { flex: 1 1 100%; min-width: 0; }
   .side-group, .side a.secondary { display: none; }
   .side-more { display: flex; flex: 1 0 44px; align-items: center; justify-content: center; padding: 10px 0; border: 0; border-radius: var(--radius-sm); background: none; color: var(--faint); cursor: pointer; }
   .side-more.on { color: var(--gold); box-shadow: inset 0 2px 0 var(--gold); }
@@ -473,6 +478,7 @@ textarea.code { display: block; width: 100%; min-height: 380px; height: calc(100
   .control-actions .btn { flex: 1 1 140px; }
   th, td { padding: 9px 10px; }
   .cfg-bar { top: -14px; }
+  .cfg-sticky { bottom: -20px; }
   .dl { grid-template-columns: 34px 34px 16px minmax(0, 1fr); }
   .kv { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .kv dd { margin-bottom: 8px; }

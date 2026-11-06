@@ -11,6 +11,7 @@
   import Status from '../lib/ui/Status.svelte';
   import Modal from '../lib/ui/Modal.svelte';
   import AreaOptions from '../lib/ui/AreaOptions.svelte';
+  import { areas } from '../lib/areas.svelte';
   import Icon from '../lib/ui/Icon.svelte';
   import Chip from '../lib/ui/Chip.svelte';
   import Empty from '../lib/ui/Empty.svelte';
@@ -222,8 +223,9 @@
     <label class="search">
       <Icon name="search" size={14} />
       <span class="sr-only">Search players</span>
-      <input type="search" placeholder="Search players" aria-label="Search players by character, account, area or address" bind:value={filter} />
+      <input type="search" placeholder="Search players" title="Character, account, area or address" bind:value={filter} />
     </label>
+    {#if res.data?.sessions.length}
     <label class="inline">
       <span>Sort</span>
       <select bind:value={sortBy}>
@@ -233,6 +235,7 @@
         <option value="connected">Longest connected</option>
       </select>
     </label>
+    {/if}
   {:else}
     <span class="grow"></span>
     <button type="button" class="btn danger" onclick={() => openBan({ kind: 'ip' })}><Icon name="ban" size={14} /> New ban</button>
@@ -265,8 +268,8 @@
                   <div class="muted small">{classLevel(s)}</div>
                 </td>
                 <td><a href={'#/characters?account=' + encodeURIComponent(s.account)}>{s.account}</a>{#if self} <Chip tone="accent">you</Chip>{/if}</td>
-                <td>{s.area}</td>
-                <td class="num">{s.instance ?? '-'}</td>
+                <td title={s.area}>{areas.name(s.area)}</td>
+                <td class="num">{s.instance ?? '—'}</td>
                 <td title={formatUnix(s.connected_at)}>{connectedFor(s.connected_at, nowSecs)}</td>
                 <td>{#if s.ip}<code>{s.ip}</code>{:else}<span class="muted">-</span>{/if}</td>
                 <td>
@@ -325,7 +328,7 @@
                     <b>{banTarget(b)}</b>
                   </span>
                 </td>
-                <td>{b.reason || '-'}</td>
+                <td>{b.reason || '—'}</td>
                 <td>{b.created_by}</td>
                 <td title={formatUnix(b.created_at)}>{formatUnix(b.created_at)}</td>
                 <td title={b.expires_at ? formatUnix(b.expires_at) : 'never'}>
@@ -405,7 +408,7 @@
         <select bind:value={instanceId} required>
           <option value="" disabled>Choose...</option>
           {#each targets as i (i.id)}
-            <option value={String(i.id)}>#{i.id} {i.area} ({i.players.length} players)</option>
+            <option value={String(i.id)}>#{i.id} {areas.name(i.area)} ({i.players.length} player{i.players.length === 1 ? '' : 's'})</option>
           {/each}
         </select>
       </label>

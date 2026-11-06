@@ -41,7 +41,7 @@
           {#each res.data.mods as m (m.id)}
             <tr>
               <td><span class="name-cell">{m.name}</span> <span class="muted">{m.id}</span></td>
-              <td>{m.version || '-'}</td>
+              <td>{m.version || '—'}</td>
               <td>{sideLabel(m.side)}</td>
               <td><Chip tone={stateTone(m.state)} dot={m.state === 'loaded'}>{m.state}</Chip></td>
               <td>{#each m.commands as c}<code>!{c}</code>{' '}{/each}</td>

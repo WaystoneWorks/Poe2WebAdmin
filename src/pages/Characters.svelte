@@ -9,6 +9,7 @@
   import Empty from '../lib/ui/Empty.svelte';
   import Spinner from '../lib/ui/Spinner.svelte';
   import { className } from '../lib/players';
+  import { areas } from '../lib/areas.svelte';
 
   // The account filter lives in the URL (#/characters?account=bob) so the other pages can link to it.
   const account = $derived(router.route.query.get('account') ?? '');
@@ -68,7 +69,7 @@
               <td>{c.league}</td>
               <td>{className(c) ?? '—'}</td>
               <td class="num">{c.level}</td>
-              <td>{c.area}</td>
+              <td title={c.area}>{areas.name(c.area)}</td>
               <td>{#if c.online}<Chip tone="ok" dot pulse>online</Chip>{:else}<span class="muted">offline</span>{/if}</td>
             </tr>
           {/each}

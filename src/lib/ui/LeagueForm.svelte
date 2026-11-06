@@ -39,6 +39,7 @@
   let flag = $state<string | null>(null);
   // Banners whose image did not load show their id instead of an empty tile.
   let broken = $state<Record<string, true>>({});
+  let loaded = $state<Record<string, true>>({});
   let hardcore = $state(true);
   let ssf = $state(true);
   let permanent = $state(false);
@@ -164,7 +165,10 @@
           {#each baseFlags as f (f.id)}
             {@const url = bannerOf(f)}
             <button type="button" role="radio" aria-checked={flag === f.id} class="banner" class:on={flag === f.id} title={f.id} onclick={() => (flag = f.id)}>
-              {#if url && !broken[f.id]}<img src={url} alt={f.id} loading="lazy" onerror={() => (broken[f.id] = true)} />{:else}<span class="muted banner-name">{f.id}</span>{/if}
+              {#if url && !broken[f.id]}
+                <img src={url} alt={f.id} loading="lazy" class:ready={loaded[f.id]} onload={() => (loaded[f.id] = true)} onerror={() => (broken[f.id] = true)} />
+                {#if !loaded[f.id]}<span class="muted banner-name loading-name">{f.id}</span>{/if}
+              {:else}<span class="muted banner-name">{f.id}</span>{/if}
             </button>
           {/each}
         </div>
@@ -223,7 +227,7 @@
     </div>
 
     {#if !family}
-      <p class="hint" aria-live="polite">Creates: <b>{creates.length ? creates.join(', ') : '-'}</b></p>
+      <p class="hint" aria-live="polite">Creates: <b>{creates.length ? creates.join(', ') : '—'}</b></p>
     {/if}
 
     <div class="actions">
@@ -236,8 +240,10 @@
 <style>
   .league-form { min-width: 0; }
   .banner-name { font-size: 11px; overflow-wrap: anywhere; padding: 4px; }
+  .banner img:not(.ready) { position: absolute; opacity: 0; }
+  .loading-name { opacity: 0.6; }
   .banners { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(96px, 100%), 1fr)); gap: 8px; max-height: 190px; overflow-y: auto; padding: 2px; }
-  .banner { cursor: pointer; display: grid; place-items: center; min-height: 52px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); }
+  .banner { position: relative; cursor: pointer; display: grid; place-items: center; min-height: 52px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius); }
   .banner:hover { border-color: var(--faint); }
   .banner.on { border-color: var(--gold); background: var(--selected-bg); }
   .banner img { max-width: 100%; max-height: 64px; object-fit: contain; }

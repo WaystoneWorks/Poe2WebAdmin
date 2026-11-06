@@ -7,6 +7,7 @@
   import Status from '../lib/ui/Status.svelte';
   import Modal from '../lib/ui/Modal.svelte';
   import AreaOptions from '../lib/ui/AreaOptions.svelte';
+  import { areas } from '../lib/areas.svelte';
   import Icon from '../lib/ui/Icon.svelte';
   import Chip from '../lib/ui/Chip.svelte';
   import Empty from '../lib/ui/Empty.svelte';
@@ -72,7 +73,7 @@
 </PageHead>
 
 <div class="toolbar">
-  <span class="muted">{res.data ? `${res.data.length} instance${res.data.length === 1 ? '' : 's'}` : ''}</span>
+  <span class="muted">{res.data?.length ? `${res.data.length} instance${res.data.length === 1 ? '' : 's'}` : ''}</span>
   <span class="grow"></span>
   {#if res.data?.length !== 0}
     <button type="button" class="btn primary" onclick={openCreate}><Icon name="plus" size={14} /> Create instance</button>
@@ -98,10 +99,10 @@
           {#each res.data as i (i.id)}
             <tr>
               <td class="num">{i.id}</td>
-              <td><span class="name-cell">{i.area}{#if i.persistent}<Chip>persistent</Chip>{/if}</span></td>
-              <td class="num">{i.seed ?? '-'}</td>
-              <td class="num">{i.topology ?? '-'}</td>
-              <td class="num">{i.orientation ?? '-'}</td>
+              <td><span class="name-cell" title={i.area}>{areas.name(i.area)}{#if i.persistent}<Chip>persistent</Chip>{/if}</span></td>
+              <td class="num">{i.seed ?? '—'}</td>
+              <td class="num">{i.topology ?? '—'}</td>
+              <td class="num">{i.orientation ?? '—'}</td>
               <td>
                 {#if i.players.length}<Chip tone="ok" dot>{i.players.length}</Chip> {i.players.join(', ')}{:else}
                   <span class="muted">empty{i.empty_for_secs != null ? ` for ${i.empty_for_secs}s` : ''}</span>

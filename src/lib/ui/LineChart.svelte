@@ -138,7 +138,7 @@
       <b>{formatClock(times[tip.i]!, true)}</b>
       {#each series as s (s.id)}
         {@const v = s.values[tip.i]}
-        <span><i style:background={s.color}></i>{s.label} <b>{v === null || v === undefined ? '-' : format(v)}</b></span>
+        <span><i style:background={s.color}></i>{s.label} <b>{v === null || v === undefined ? '—' : format(v)}</b></span>
       {/each}
     </div>
   {/if}
